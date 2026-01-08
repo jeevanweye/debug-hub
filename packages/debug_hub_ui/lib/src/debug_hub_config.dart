@@ -46,6 +46,9 @@ class DebugHubConfig {
   /// Enable crash monitoring
   final bool enableCrashMonitoring;
 
+  /// Enable event monitoring (analytics events)
+  final bool enableEventMonitoring;
+
   /// Maximum number of logs to store
   final int maxLogs;
 
@@ -77,6 +80,7 @@ class DebugHubConfig {
     this.enableLogMonitoring = true,
     this.enableNetworkMonitoring = true,
     this.enableCrashMonitoring = true,
+    this.enableEventMonitoring = true,
     this.maxLogs = 1000,
     this.maxNetworkRequests = 500,
     this.showBubbleOnStart = true,
@@ -100,6 +104,7 @@ class DebugHubConfig {
     bool? enableLogMonitoring,
     bool? enableNetworkMonitoring,
     bool? enableCrashMonitoring,
+    bool? enableEventMonitoring,
     int? maxLogs,
     int? maxNetworkRequests,
     bool? showBubbleOnStart,
@@ -122,6 +127,7 @@ class DebugHubConfig {
       enableLogMonitoring: enableLogMonitoring ?? this.enableLogMonitoring,
       enableNetworkMonitoring: enableNetworkMonitoring ?? this.enableNetworkMonitoring,
       enableCrashMonitoring: enableCrashMonitoring ?? this.enableCrashMonitoring,
+      enableEventMonitoring: enableEventMonitoring ?? this.enableEventMonitoring,
       maxLogs: maxLogs ?? this.maxLogs,
       maxNetworkRequests: maxNetworkRequests ?? this.maxNetworkRequests,
       showBubbleOnStart: showBubbleOnStart ?? this.showBubbleOnStart,

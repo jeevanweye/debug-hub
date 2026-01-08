@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:base/base.dart';
 import '../debug_hub_config.dart';
 
 class AppInfoScreen extends StatefulWidget {
@@ -21,11 +22,27 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
   PackageInfo? _packageInfo;
   Map<String, dynamic>? _deviceInfo;
   bool _isLoading = true;
+  String _storageSize = '0 B';
+  Map<String, int> _itemCounts = {};
 
   @override
   void initState() {
     super.initState();
     _loadInfo();
+    _loadStorageInfo();
+  }
+
+  Future<void> _loadStorageInfo() async {
+    final storage = DebugStorage();
+    final size = await storage.getStorageSizeFormatted();
+    final counts = await storage.getItemCounts();
+    
+    if (mounted) {
+      setState(() {
+        _storageSize = size;
+        _itemCounts = counts;
+      });
+    }
   }
 
   Future<void> _loadInfo() async {
@@ -110,10 +127,78 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     buffer.writeln('  Platform: ${Platform.operatingSystem}');
     buffer.writeln('  OS Version: ${Platform.operatingSystemVersion}');
 
+    buffer.writeln();
+    buffer.writeln('Storage Info:');
+    buffer.writeln('  Size: $_storageSize');
+    buffer.writeln('  Logs: ${_itemCounts['logs'] ?? 0}');
+    buffer.writeln('  Network Requests: ${_itemCounts['network'] ?? 0}');
+    buffer.writeln('  Crashes: ${_itemCounts['crashes'] ?? 0}');
+    buffer.writeln('  Events: ${_itemCounts['events'] ?? 0}');
+
     Clipboard.setData(ClipboardData(text: buffer.toString()));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('All info copied to clipboard')),
     );
+  }
+
+  Future<void> _clearAllStorage() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear All Storage'),
+        content: const Text(
+          'This will permanently delete all stored debug data including:\n\n'
+          '• Network requests\n'
+          '• Logs\n'
+          '• Crash reports\n'
+          '• Analytics events\n\n'
+          'This action cannot be undone. Continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Clear All'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      // Show loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              SizedBox(width: 16),
+              Text('Clearing storage...'),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      await DebugStorage().clearAll();
+      await _loadStorageInfo();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✓ All storage cleared successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -140,6 +225,10 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
             ),
           ],
         ),
+        const SizedBox(height: 8),
+
+        // Storage Info Card (at top)
+        _buildStorageCard(),
         const SizedBox(height: 16),
 
         // App Info
@@ -263,6 +352,118 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStorageCard() {
+    final totalItems = _itemCounts.values.fold(0, (sum, count) => sum + count);
+
+    return Card(
+      elevation: 2,
+      color: Colors.blue[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.storage, color: widget.config.mainColor),
+                const SizedBox(width: 8),
+                const Text(
+                  'Debug Storage',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Storage Used',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _storageSize,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: widget.config.mainColor,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      'Total Items',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      totalItems.toString(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Item breakdown
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _buildStorageChip('Logs', _itemCounts['logs'] ?? 0, Icons.article),
+                _buildStorageChip('Network', _itemCounts['network'] ?? 0, Icons.network_check),
+                _buildStorageChip('Crashes', _itemCounts['crashes'] ?? 0, Icons.warning_amber),
+                _buildStorageChip('Events', _itemCounts['events'] ?? 0, Icons.analytics),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Clear storage button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _clearAllStorage,
+                icon: const Icon(Icons.delete_sweep),
+                label: const Text('Clear All Storage'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStorageChip(String label, int count, IconData icon) {
+    return Chip(
+      avatar: Icon(icon, size: 16),
+      label: Text('$label: $count'),
+      visualDensity: VisualDensity.compact,
     );
   }
 }

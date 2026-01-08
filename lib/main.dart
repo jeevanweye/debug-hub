@@ -1,14 +1,16 @@
-import 'package:debug_hub/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:debug_hub_ui/debug_hub_ui.dart';
 import 'package:base/base.dart';
 import 'package:network/network.dart';
+import 'package:events/events.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() {
-  // Initialize DebugHub with configuration
-  DebugHub().init(
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize DebugHub with configuration (only in debug mode)
+  await DebugHub().init(
     config: const DebugHubConfig(
       serverURL: 'https://jsonplaceholder.typicode.com',
       mainColor: Color(0xFF42d459),
@@ -16,12 +18,13 @@ void main() {
       enableLogMonitoring: true,
       enableNetworkMonitoring: true,
       enableCrashMonitoring: true,
+      enableEventMonitoring: true, // Enable event monitoring
       showBubbleOnStart: true,
       emailToRecipients: ['developer@example.com'],
     ),
   );
 
-  // Enable DebugHub
+  // Enable DebugHub (only works in debug mode)
   DebugHub().enable();
 
   runApp(const MyApp());
@@ -60,6 +63,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final DebugStorage _storage = DebugStorage();
   final NetworkInterceptor _networkInterceptor = NetworkInterceptor();
+  final EventTracker _eventTracker = EventTracker();
   int _counter = 0;
 
   void _incrementCounter() {
@@ -74,6 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
         message: 'Counter incremented to $_counter',
         tag: 'Counter',
       ),
+    );
+
+    // Track event
+    _eventTracker.trackEvent(
+      'counter_incremented',
+      properties: {
+        'counter_value': _counter,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+      source: 'Custom',
     );
   }
 
@@ -427,6 +441,63 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Analytics Events',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _eventTracker.trackFirebaseEvent(
+                            'button_click',
+                            properties: {
+                              'button_name': 'test_firebase',
+                              'screen': 'home',
+                            },
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Firebase event tracked'),
+                              backgroundColor: Colors.blue,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.local_fire_department),
+                        label: const Text('Track Firebase Event'),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _eventTracker.trackCleverTapEvent(
+                            'user_action',
+                            properties: {
+                              'action_type': 'test',
+                              'value': 100,
+                            },
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('CleverTap event tracked'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.track_changes),
+                        label: const Text('Track CleverTap Event'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 32),
               const Text(
                 'Features:',
@@ -436,11 +507,12 @@ class _MyHomePageState extends State<MyHomePage> {
               const Text(
                 '• Network monitoring\n'
                 '• Log capture\n'
-                '• Crash reporting\n'
-                '• Storage browser\n'
+                '• Non-fatal error tracking\n'
+                '• Analytics events tracking\n'
                 '• App & device info\n'
                 '• Always visible in debug mode\n'
-                '• Share debug data',
+                '• Share debug data\n'
+                '• Share as cURL command',
                 textAlign: TextAlign.left,
               ),
             ],

@@ -6,10 +6,12 @@ import '../debug_hub_config.dart';
 
 class CrashesScreen extends StatefulWidget {
   final DebugHubConfig config;
+  final bool showOnlyNonFatal;
 
   const CrashesScreen({
     super.key,
     required this.config,
+    this.showOnlyNonFatal = true,
   });
 
   @override
@@ -19,12 +21,25 @@ class CrashesScreen extends StatefulWidget {
 class _CrashesScreenState extends State<CrashesScreen> {
   final DebugStorage _storage = DebugStorage();
 
+  List<CrashReport> get _filteredCrashes {
+    final allCrashes = _storage.getCrashReports().reversed.toList();
+    if (widget.showOnlyNonFatal) {
+      return allCrashes.where((crash) => !crash.isFatal).toList();
+    }
+    return allCrashes;
+  }
+
   void _clearAll() {
+    final title = widget.showOnlyNonFatal ? 'Clear Non-Fatal Errors' : 'Clear Crashes';
+    final content = widget.showOnlyNonFatal 
+        ? 'Are you sure you want to clear all non-fatal error reports?'
+        : 'Are you sure you want to clear all crash reports?';
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Crashes'),
-        content: const Text('Are you sure you want to clear all crash reports?'),
+        title: Text(title),
+        content: Text(content),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -44,30 +59,34 @@ class _CrashesScreenState extends State<CrashesScreen> {
   }
 
   void _shareAll() {
-    final crashes = _storage.getCrashReports();
+    final crashes = _filteredCrashes;
+    final errorType = widget.showOnlyNonFatal ? 'Non-Fatal Errors' : 'Crashes';
+    
     if (crashes.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No crash reports to share')),
+        SnackBar(content: Text('No $errorType to share')),
       );
       return;
     }
 
     final buffer = StringBuffer();
-    buffer.writeln('DebugHub Crash Reports');
+    buffer.writeln('DebugHub $errorType');
     buffer.writeln('=' * 50);
-    buffer.writeln('Total Crashes: ${crashes.length}');
+    buffer.writeln('Total: ${crashes.length}');
     buffer.writeln('Generated: ${DateTime.now()}');
     buffer.writeln('=' * 50);
     buffer.writeln();
 
     for (var crash in crashes) {
       buffer.writeln('Time: ${crash.timestamp}');
+      buffer.writeln('Type: ${crash.isFatal ? 'Fatal' : 'Non-Fatal'}');
+      if (crash.context != null) buffer.writeln('Context: ${crash.context}');
       buffer.writeln('Error: ${crash.error}');
       buffer.writeln('Stack Trace:\n${crash.stackTrace}');
       buffer.writeln('-' * 50);
     }
 
-    Share.share(buffer.toString(), subject: 'DebugHub Crash Reports');
+    Share.share(buffer.toString(), subject: 'DebugHub $errorType');
   }
 
   void _showCrashDetail(CrashReport crash) {
@@ -121,6 +140,9 @@ class _CrashesScreenState extends State<CrashesScreen> {
                     controller: scrollController,
                     children: [
                       _buildDetailRow('Time', crash.timestamp.toString()),
+                      _buildDetailRow('Type', crash.isFatal ? 'Fatal' : 'Non-Fatal'),
+                      if (crash.context != null)
+                        _buildDetailRow('Context', crash.context!),
                       const SizedBox(height: 16),
                       const Text(
                         'Error',
@@ -189,7 +211,8 @@ class _CrashesScreenState extends State<CrashesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final crashes = _storage.getCrashReports().reversed.toList();
+    final crashes = _filteredCrashes;
+    final errorType = widget.showOnlyNonFatal ? 'Non-Fatal Error' : 'Crash';
 
     return Column(
       children: [
@@ -201,7 +224,7 @@ class _CrashesScreenState extends State<CrashesScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${crashes.length} crash${crashes.length != 1 ? 'es' : ''}',
+                '${crashes.length} ${errorType.toLowerCase()}${crashes.length != 1 ? 's' : ''}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Row(
@@ -229,7 +252,7 @@ class _CrashesScreenState extends State<CrashesScreen> {
 
         // Crash list
         Expanded(
-          child: crashes.isEmpty
+          child:               crashes.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -241,7 +264,7 @@ class _CrashesScreenState extends State<CrashesScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No crashes',
+                        'No ${errorType.toLowerCase()}s',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -249,7 +272,9 @@ class _CrashesScreenState extends State<CrashesScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Your app is running smoothly!',
+                        widget.showOnlyNonFatal 
+                            ? 'No non-fatal errors recorded!'
+                            : 'Your app is running smoothly!',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[500],
@@ -274,9 +299,9 @@ class _CrashesScreenState extends State<CrashesScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.error,
-                              color: Colors.red,
+                            Icon(
+                              widget.showOnlyNonFatal ? Icons.warning_amber : Icons.error,
+                              color: widget.showOnlyNonFatal ? Colors.orange : Colors.red,
                               size: 24,
                             ),
                             const SizedBox(width: 12),
@@ -286,24 +311,24 @@ class _CrashesScreenState extends State<CrashesScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: const Text(
-                                          'CRASH',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: crash.isFatal ? Colors.red : Colors.orange,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            crash.isFatal ? 'FATAL' : 'NON-FATAL',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
                                       const Spacer(),
                                       Text(
                                         '${crash.timestamp.hour.toString().padLeft(2, '0')}:'

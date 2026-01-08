@@ -155,5 +155,33 @@ class NetworkRequest {
       return body.toString();
     }
   }
+
+  /// Convert this network request to a cURL command
+  String toCurl() {
+    final buffer = StringBuffer();
+    buffer.write('curl -X ${method.name.toUpperCase()}');
+    
+    // Add headers
+    if (headers != null && headers!.isNotEmpty) {
+      for (var entry in headers!.entries) {
+        buffer.write(' \\\n  -H "${entry.key}: ${entry.value}"');
+      }
+    }
+    
+    // Add body
+    if (requestBody != null) {
+      final bodyStr = requestBody is String 
+          ? requestBody 
+          : jsonEncode(requestBody);
+      // Escape single quotes in the body
+      final escapedBody = bodyStr.toString().replaceAll("'", "'\\''");
+      buffer.write(" \\\n  -d '$escapedBody'");
+    }
+    
+    // Add URL (must be last)
+    buffer.write(' \\\n  "$url"');
+    
+    return buffer.toString();
+  }
 }
 

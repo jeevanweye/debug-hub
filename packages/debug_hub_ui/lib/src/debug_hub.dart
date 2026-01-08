@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:base/base.dart';
 import 'package:network/network.dart';
 import 'package:non_fatal/non_fatal.dart';
+import 'package:events/events.dart';
 import 'debug_hub_config.dart';
 import 'widgets/debug_bubble.dart';
 
@@ -19,13 +21,31 @@ class DebugHub {
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
   /// Initialize DebugHub with configuration
-  void init({DebugHubConfig? config}) {
+  /// Returns false if not in debug mode
+  Future<bool> init({DebugHubConfig? config}) async {
+    // Only allow in debug mode
+    if (!kDebugMode) {
+      debugPrint('⚠️ DebugHub can only be used in debug mode');
+      return false;
+    }
+
     _config = config ?? const DebugHubConfig();
+    
+    // Initialize persistent storage
+    await DebugStorage().initialize();
+    
+    return true;
   }
 
   /// Enable DebugHub
-  void enable() {
-    if (_isEnabled) return;
+  /// Returns false if not in debug mode
+  bool enable() {
+    // Enforce debug mode only
+    if (!kDebugMode) {
+      return false;
+    }
+
+    if (_isEnabled) return true;
     
     _isEnabled = true;
 
@@ -44,24 +64,35 @@ class DebugHub {
       CrashHandler().enable();
     }
 
-    debugPrint('🚀 DebugHub enabled');
+    // Enable event monitoring
+    if (_config.enableEventMonitoring) {
+      EventTracker().enable();
+    }
+
+    debugPrint('🚀 DebugHub enabled (Debug Mode Only)');
+    return true;
   }
 
   /// Disable DebugHub
   void disable() {
     _isEnabled = false;
     NetworkInterceptor().disable();
+    EventTracker().disable();
     debugPrint('🛑 DebugHub disabled');
   }
 
-  /// Clear all debug data
-  void clearAll() {
-    DebugStorage().clearAll();
+  /// Clear all debug data including persistent storage
+  Future<void> clearAll() async {
+    await DebugStorage().clearAll();
   }
 
   /// Wrap your MaterialApp with this to enable DebugHub overlay
+  /// Only shows in debug mode
   Widget wrap(Widget child) {
-    if (!_isEnabled || !_config.showBubbleOnStart) return child;
+    // Don't show in release mode
+    if (!kDebugMode || !_isEnabled || !_config.showBubbleOnStart) {
+      return child;
+    }
 
     return Stack(
       fit: StackFit.expand,

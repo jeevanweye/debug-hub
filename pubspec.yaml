@@ -48,6 +48,8 @@ dependencies:
     path: packages/storage
   non_fatal:
     path: packages/non_fatal
+  events:
+    path: packages/events
   
   # For example/demo purposes
   http: ^1.2.0

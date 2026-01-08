@@ -83,6 +83,19 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen> with SingleTi
     Share.share(buffer.toString(), subject: 'Network Request Details');
   }
 
+  void _shareAsCurl() {
+    final curlCommand = widget.request.toCurl();
+    Share.share(curlCommand, subject: 'cURL Command');
+  }
+
+  void _copyAsCurl() {
+    final curlCommand = widget.request.toCurl();
+    Clipboard.setData(ClipboardData(text: curlCommand));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('cURL command copied to clipboard')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,9 +104,53 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen> with SingleTi
         backgroundColor: widget.config.mainColor,
         foregroundColor: Colors.white,
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.share),
-            onPressed: _shareRequest,
+            onSelected: (value) {
+              switch (value) {
+                case 'share':
+                  _shareRequest();
+                  break;
+                case 'share_curl':
+                  _shareAsCurl();
+                  break;
+                case 'copy_curl':
+                  _copyAsCurl();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'share',
+                child: Row(
+                  children: [
+                    Icon(Icons.share),
+                    SizedBox(width: 8),
+                    Text('Share Details'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'share_curl',
+                child: Row(
+                  children: [
+                    Icon(Icons.terminal),
+                    SizedBox(width: 8),
+                    Text('Share as cURL'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'copy_curl',
+                child: Row(
+                  children: [
+                    Icon(Icons.copy),
+                    SizedBox(width: 8),
+                    Text('Copy as cURL'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
         bottom: TabBar(

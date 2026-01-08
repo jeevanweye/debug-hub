@@ -3,7 +3,7 @@ import '../debug_hub_config.dart';
 import 'network_screen.dart';
 import 'logs_screen.dart';
 import 'crashes_screen.dart';
-import 'storage_screen.dart';
+import 'events_screen.dart';
 import 'app_info_screen.dart';
 
 class DebugMainScreen extends StatefulWidget {
@@ -50,8 +50,8 @@ class _DebugMainScreenState extends State<DebugMainScreen> with SingleTickerProv
           tabs: [
             const Tab(icon: Icon(Icons.network_check), text: 'Network'),
             const Tab(icon: Icon(Icons.article), text: 'Logs'),
-            const Tab(icon: Icon(Icons.error_outline), text: 'Crashes'),
-            const Tab(icon: Icon(Icons.folder), text: 'Storage'),
+            const Tab(icon: Icon(Icons.warning_amber), text: 'Non-Fatal'),
+            const Tab(icon: Icon(Icons.analytics), text: 'Events'),
             const Tab(icon: Icon(Icons.info), text: 'App Info'),
             if (widget.config.additionalTab != null)
               Tab(
@@ -67,7 +67,7 @@ class _DebugMainScreenState extends State<DebugMainScreen> with SingleTickerProv
           NetworkScreen(config: widget.config),
           LogsScreen(config: widget.config),
           CrashesScreen(config: widget.config),
-          StorageScreen(config: widget.config),
+          EventsScreen(config: widget.config),
           AppInfoScreen(config: widget.config),
           if (widget.config.additionalTab != null)
             widget.config.additionalTab!,
