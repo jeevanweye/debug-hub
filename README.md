@@ -1,16 +1,16 @@
-# debug_hub
+# DebugHub
 
-Debug tools
+**DebugHub** is an internal debugging and observability toolkit that helps developers track **events, non-fatal errors, debug notifications, and local logs** during development and testing.
 
-## Getting Started
+It provides a simple, unified API to improve app visibility without impacting production behavior.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- 📊 **Events** – Track internal events and user flows
+- 🐞 **Non-Fatal Errors** – Capture handled exceptions and warnings
+- 🔔 **Debug Notifications** – Show internal alerts for dev & QA builds
+- 📝 **Local Logs** – Structured logs for easier debugging
+- 🌐 **Network** – Network Response Monitoring
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
