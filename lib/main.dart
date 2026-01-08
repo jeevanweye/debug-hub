@@ -1,3 +1,4 @@
+import 'package:debug_hub/dashboard.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Text("data"),
+      home: DashBoard(),
     );
   }
 }
