@@ -1,3 +1,4 @@
+import 'package:debug_hub/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:debug_hub_ui/debug_hub_ui.dart';
 import 'package:base/base.dart';
@@ -32,7 +33,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DebugHub Demo',
+
+      title: 'Debug Hub',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -444,6 +447,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      home: DashBoard(),
     );
   }
 }
