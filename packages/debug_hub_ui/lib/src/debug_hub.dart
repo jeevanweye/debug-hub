@@ -4,6 +4,7 @@ import 'package:base/base.dart';
 import 'package:network/network.dart';
 import 'package:non_fatal/non_fatal.dart';
 import 'package:events/events.dart';
+import 'package:notification/notification.dart';
 import 'debug_hub_config.dart';
 import 'widgets/debug_bubble.dart';
 
@@ -69,6 +70,11 @@ class DebugHub {
       EventTracker().enable();
     }
 
+    // Enable notification monitoring
+    if (_config.enableNotificationMonitoring) {
+      NotificationLogger().enable();
+    }
+
     debugPrint('🚀 DebugHub enabled (Debug Mode Only)');
     return true;
   }
@@ -78,6 +84,7 @@ class DebugHub {
     _isEnabled = false;
     NetworkInterceptor().disable();
     EventTracker().disable();
+    NotificationLogger().disable();
     debugPrint('🛑 DebugHub disabled');
   }
 

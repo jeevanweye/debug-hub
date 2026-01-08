@@ -49,6 +49,9 @@ class DebugHubConfig {
   /// Enable event monitoring (analytics events)
   final bool enableEventMonitoring;
 
+  /// Enable notification monitoring
+  final bool enableNotificationMonitoring;
+
   /// Maximum number of logs to store
   final int maxLogs;
 
@@ -63,6 +66,9 @@ class DebugHubConfig {
 
   /// Enable performance monitoring
   final bool enablePerformanceMonitoring;
+
+  /// Package name for event validation (e.g., com.example.app)
+  final String? packageName;
 
   const DebugHubConfig({
     this.serverURL,
@@ -81,11 +87,13 @@ class DebugHubConfig {
     this.enableNetworkMonitoring = true,
     this.enableCrashMonitoring = true,
     this.enableEventMonitoring = true,
+    this.enableNotificationMonitoring = true,
     this.maxLogs = 1000,
     this.maxNetworkRequests = 500,
     this.showBubbleOnStart = true,
     this.bubbleAlignment = Alignment.bottomRight,
     this.enablePerformanceMonitoring = true,
+    this.packageName,
   });
 
   DebugHubConfig copyWith({
@@ -105,11 +113,13 @@ class DebugHubConfig {
     bool? enableNetworkMonitoring,
     bool? enableCrashMonitoring,
     bool? enableEventMonitoring,
+    bool? enableNotificationMonitoring,
     int? maxLogs,
     int? maxNetworkRequests,
     bool? showBubbleOnStart,
     Alignment? bubbleAlignment,
     bool? enablePerformanceMonitoring,
+    String? packageName,
   }) {
     return DebugHubConfig(
       serverURL: serverURL ?? this.serverURL,
@@ -128,11 +138,13 @@ class DebugHubConfig {
       enableNetworkMonitoring: enableNetworkMonitoring ?? this.enableNetworkMonitoring,
       enableCrashMonitoring: enableCrashMonitoring ?? this.enableCrashMonitoring,
       enableEventMonitoring: enableEventMonitoring ?? this.enableEventMonitoring,
+      enableNotificationMonitoring: enableNotificationMonitoring ?? this.enableNotificationMonitoring,
       maxLogs: maxLogs ?? this.maxLogs,
       maxNetworkRequests: maxNetworkRequests ?? this.maxNetworkRequests,
       showBubbleOnStart: showBubbleOnStart ?? this.showBubbleOnStart,
       bubbleAlignment: bubbleAlignment ?? this.bubbleAlignment,
       enablePerformanceMonitoring: enablePerformanceMonitoring ?? this.enablePerformanceMonitoring,
+      packageName: packageName ?? this.packageName,
     );
   }
 

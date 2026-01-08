@@ -5,8 +5,19 @@ import '../models/debug_log.dart';
 import '../models/network_request.dart';
 import '../models/crash_report.dart';
 import '../models/analytics_event.dart';
+import '../models/notification_log.dart';
+import '../interfaces/i_persistent_storage.dart';
 
-class PersistentStorage {
+/// Persistent storage implementation using Hive
+/// Implements multiple interfaces following Interface Segregation Principle
+class PersistentStorage implements 
+    IPersistentStorage,
+    IPersistentLogStorage,
+    IPersistentNetworkStorage,
+    IPersistentCrashStorage,
+    IPersistentEventStorage,
+    IPersistentNotificationStorage {
+  
   static final PersistentStorage _instance = PersistentStorage._internal();
   factory PersistentStorage() => _instance;
   PersistentStorage._internal();
@@ -15,15 +26,18 @@ class PersistentStorage {
   static const String _networkBoxName = 'network_requests';
   static const String _crashesBoxName = 'crash_reports';
   static const String _eventsBoxName = 'analytics_events';
+  static const String _notificationsBoxName = 'notification_logs';
 
   Box<String>? _logsBox;
   Box<String>? _networkBox;
   Box<String>? _crashesBox;
   Box<String>? _eventsBox;
+  Box<String>? _notificationsBox;
 
   bool _isInitialized = false;
 
   /// Initialize Hive and open boxes
+  @override
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -34,6 +48,7 @@ class PersistentStorage {
       _networkBox = await Hive.openBox<String>(_networkBoxName);
       _crashesBox = await Hive.openBox<String>(_crashesBoxName);
       _eventsBox = await Hive.openBox<String>(_eventsBoxName);
+      _notificationsBox = await Hive.openBox<String>(_notificationsBoxName);
       
       _isInitialized = true;
     } catch (e) {
@@ -44,6 +59,7 @@ class PersistentStorage {
   bool get isInitialized => _isInitialized;
 
   // Logs
+  @override
   Future<void> saveLog(DebugLog log) async {
     if (!_isInitialized) return;
     try {
@@ -53,6 +69,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<List<DebugLog>> loadLogs() async {
     if (!_isInitialized) return [];
     try {
@@ -66,6 +83,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<void> clearLogs() async {
     if (!_isInitialized) return;
     try {
@@ -76,6 +94,7 @@ class PersistentStorage {
   }
 
   // Network Requests
+  @override
   Future<void> saveNetworkRequest(NetworkRequest request) async {
     if (!_isInitialized) return;
     try {
@@ -94,6 +113,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<List<NetworkRequest>> loadNetworkRequests() async {
     if (!_isInitialized) return [];
     try {
@@ -107,6 +127,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<void> clearNetworkRequests() async {
     if (!_isInitialized) return;
     try {
@@ -117,6 +138,7 @@ class PersistentStorage {
   }
 
   // Crash Reports
+  @override
   Future<void> saveCrashReport(CrashReport report) async {
     if (!_isInitialized) return;
     try {
@@ -126,6 +148,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<List<CrashReport>> loadCrashReports() async {
     if (!_isInitialized) return [];
     try {
@@ -139,6 +162,7 @@ class PersistentStorage {
     }
   }
 
+  @override
   Future<void> clearCrashReports() async {
     if (!_isInitialized) return;
     try {
@@ -149,7 +173,8 @@ class PersistentStorage {
   }
 
   // Analytics Events
-  Future<void> saveEvent(AnalyticsEvent event) async {
+  @override
+  Future<void> saveAnalyticsEvent(AnalyticsEvent event) async {
     if (!_isInitialized) return;
     try {
       await _eventsBox?.put(event.id, jsonEncode(event.toJson()));
@@ -158,7 +183,8 @@ class PersistentStorage {
     }
   }
 
-  Future<List<AnalyticsEvent>> loadEvents() async {
+  @override
+  Future<List<AnalyticsEvent>> loadAnalyticsEvents() async {
     if (!_isInitialized) return [];
     try {
       final values = _eventsBox?.values.toList() ?? [];
@@ -171,7 +197,8 @@ class PersistentStorage {
     }
   }
 
-  Future<void> clearEvents() async {
+  @override
+  Future<void> clearAnalyticsEvents() async {
     if (!_isInitialized) return;
     try {
       await _eventsBox?.clear();
@@ -180,18 +207,56 @@ class PersistentStorage {
     }
   }
 
+  // Notification Logs
+  @override
+  Future<void> saveNotificationLog(NotificationLog log) async {
+    if (!_isInitialized) return;
+    try {
+      await _notificationsBox?.put(log.id, jsonEncode(log.toJson()));
+    } catch (e) {
+      debugPrint('Error saving notification log: $e');
+    }
+  }
+
+  @override
+  Future<List<NotificationLog>> loadNotificationLogs() async {
+    if (!_isInitialized) return [];
+    try {
+      final values = _notificationsBox?.values.toList() ?? [];
+      return values
+          .map((json) => NotificationLog.fromJson(jsonDecode(json)))
+          .toList();
+    } catch (e) {
+      debugPrint('Error loading notification logs: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<void> clearNotificationLogs() async {
+    if (!_isInitialized) return;
+    try {
+      await _notificationsBox?.clear();
+    } catch (e) {
+      debugPrint('Error clearing notification logs: $e');
+    }
+  }
+
   // Clear all data
+  @override
   Future<void> clearAll() async {
     if (!_isInitialized) return;
     await Future.wait([
       clearLogs(),
       clearNetworkRequests(),
       clearCrashReports(),
-      clearEvents(),
+      clearAnalyticsEvents(),
+      clearNotificationLogs(),
     ]);
   }
 
   /// Get total storage size in bytes
+  @override
   Future<int> getStorageSize() async {
     if (!_isInitialized) return 0;
     
@@ -199,7 +264,7 @@ class PersistentStorage {
       int totalSize = 0;
       
       // Calculate size of each box
-      final boxes = [_logsBox, _networkBox, _crashesBox, _eventsBox];
+      final boxes = [_logsBox, _networkBox, _crashesBox, _eventsBox, _notificationsBox];
       
       for (final box in boxes) {
         if (box != null) {
@@ -226,6 +291,7 @@ class PersistentStorage {
   }
 
   /// Get count of items in each category
+  @override
   Future<Map<String, int>> getItemCounts() async {
     if (!_isInitialized) {
       return {
@@ -241,16 +307,24 @@ class PersistentStorage {
       'network': _networkBox?.length ?? 0,
       'crashes': _crashesBox?.length ?? 0,
       'events': _eventsBox?.length ?? 0,
+      'notifications': _notificationsBox?.length ?? 0,
     };
   }
 
   /// Close all boxes (call on app dispose)
+  @override
   Future<void> close() async {
     await _logsBox?.close();
     await _networkBox?.close();
     await _crashesBox?.close();
     await _eventsBox?.close();
+    await _notificationsBox?.close();
     _isInitialized = false;
   }
+
+  // Additional helper methods (not part of interface)
+  Future<void> saveEvent(AnalyticsEvent event) => saveAnalyticsEvent(event);
+  Future<List<AnalyticsEvent>> loadEvents() => loadAnalyticsEvents();
+  Future<void> clearEvents() => clearAnalyticsEvents();
 }
 

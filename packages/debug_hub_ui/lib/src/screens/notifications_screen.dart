@@ -2,59 +2,79 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:base/base.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:events/events.dart';
 import 'dart:convert';
 import '../debug_hub_config.dart';
 
-class EventsScreen extends StatefulWidget {
+class NotificationsScreen extends StatefulWidget {
   final DebugHubConfig config;
 
-  const EventsScreen({
+  const NotificationsScreen({
     super.key,
     required this.config,
   });
 
   @override
-  State<EventsScreen> createState() => _EventsScreenState();
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _EventsScreenState extends State<EventsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen> {
   final DebugStorage _storage = DebugStorage();
   String _searchQuery = '';
-  String? _selectedSource;
+  NotificationType? _selectedType;
 
-  List<AnalyticsEvent> get _filteredEvents {
-    var events = _storage.getEvents().reversed.toList();
+  List<NotificationLog> get _filteredLogs {
+    var logs = _storage.getNotificationLogs().reversed.toList();
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
-      events = events.where((event) {
-        return event.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (event.source?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
+      logs = logs.where((log) {
+        return (log.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
+            (log.body?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
+            (log.notificationId?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
       }).toList();
     }
 
-    // Apply source filter
-    if (_selectedSource != null) {
-      events = events.where((event) => event.source == _selectedSource).toList();
+    // Apply type filter
+    if (_selectedType != null) {
+      logs = logs.where((log) => log.type == _selectedType).toList();
     }
 
-    return events;
+    return logs;
   }
 
-  Set<String> get _availableSources {
-    return _storage.getEvents()
-        .where((e) => e.source != null)
-        .map((e) => e.source!)
-        .toSet();
+  Color _getTypeColor(NotificationType type) {
+    switch (type) {
+      case NotificationType.received:
+        return Colors.blue;
+      case NotificationType.tapped:
+        return Colors.green;
+    }
+  }
+
+  IconData _getTypeIcon(NotificationType type) {
+    switch (type) {
+      case NotificationType.received:
+        return Icons.notifications;
+      case NotificationType.tapped:
+        return Icons.touch_app;
+    }
+  }
+
+  String _getTypeLabel(NotificationType type) {
+    switch (type) {
+      case NotificationType.received:
+        return 'Received';
+      case NotificationType.tapped:
+        return 'Tapped';
+    }
   }
 
   void _clearAll() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Events'),
-        content: const Text('Are you sure you want to clear all analytics events?'),
+        title: const Text('Clear Notification Logs'),
+        content: const Text('Are you sure you want to clear all notification logs?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -62,7 +82,7 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
           TextButton(
             onPressed: () {
-              _storage.clearEvents();
+              _storage.clearNotificationLogs();
               Navigator.pop(context);
               setState(() {});
             },
@@ -73,56 +93,42 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  void _openEventValidation() {
-    final packageName = widget.config.packageName ?? 'com.example.app';
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EventValidationDashboardScreen(
-          packageName: packageName,
-          config: EventValidationConfig(
-            mainColor: widget.config.mainColor,
-          ),
-        ),
-      ),
-    );
-  }
-
   void _shareAll() {
-    final events = _filteredEvents;
-    if (events.isEmpty) {
+    final logs = _filteredLogs;
+    if (logs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No events to share')),
+        const SnackBar(content: Text('No notification logs to share')),
       );
       return;
     }
 
     final buffer = StringBuffer();
-    buffer.writeln('DebugHub Analytics Events');
+    buffer.writeln('DebugHub Notification Logs');
     buffer.writeln('=' * 50);
-    buffer.writeln('Total Events: ${events.length}');
+    buffer.writeln('Total Logs: ${logs.length}');
     buffer.writeln('Generated: ${DateTime.now()}');
     buffer.writeln('=' * 50);
     buffer.writeln();
 
-    for (var event in events) {
-      buffer.writeln('Event: ${event.name}');
-      if (event.source != null) buffer.writeln('Source: ${event.source}');
-      buffer.writeln('Time: ${event.timestamp}');
-      if (event.userId != null) buffer.writeln('User ID: ${event.userId}');
-      if (event.sessionId != null) buffer.writeln('Session ID: ${event.sessionId}');
-      if (event.properties != null && event.properties!.isNotEmpty) {
-        buffer.writeln('Properties:');
-        buffer.writeln(JsonEncoder.withIndent('  ').convert(event.properties));
+    for (var log in logs) {
+      buffer.writeln('[${_getTypeLabel(log.type).toUpperCase()}] ${log.timestamp}');
+      if (log.notificationId != null) buffer.writeln('ID: ${log.notificationId}');
+      if (log.title != null) buffer.writeln('Title: ${log.title}');
+      if (log.body != null) buffer.writeln('Body: ${log.body}');
+      if (log.payload != null && log.payload!.isNotEmpty) {
+        buffer.writeln('Payload:');
+        buffer.writeln(JsonEncoder.withIndent('  ').convert(log.payload));
+      }
+      if (log.wasTapped && log.tappedAt != null) {
+        buffer.writeln('Tapped At: ${log.tappedAt}');
       }
       buffer.writeln('-' * 50);
     }
 
-    Share.share(buffer.toString(), subject: 'DebugHub Analytics Events');
+    Share.share(buffer.toString(), subject: 'DebugHub Notification Logs');
   }
 
-  void _showEventDetail(AnalyticsEvent event) {
+  void _showLogDetail(NotificationLog log) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -141,7 +147,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Event Details',
+                      'Notification Details',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     Row(
@@ -150,10 +156,12 @@ class _EventsScreenState extends State<EventsScreen> {
                           icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(
-                              ClipboardData(text: JsonEncoder.withIndent('  ').convert(event.toJson())),
+                              ClipboardData(
+                                text: JsonEncoder.withIndent('  ').convert(log.toJson()),
+                              ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Event copied to clipboard')),
+                              const SnackBar(content: Text('Notification log copied to clipboard')),
                             );
                           },
                         ),
@@ -170,18 +178,24 @@ class _EventsScreenState extends State<EventsScreen> {
                   child: ListView(
                     controller: scrollController,
                     children: [
-                      _buildDetailRow('Event Name', event.name),
-                      if (event.source != null)
-                        _buildDetailRow('Source', event.source!),
-                      _buildDetailRow('Time', event.timestamp.toString()),
-                      if (event.userId != null)
-                        _buildDetailRow('User ID', event.userId!),
-                      if (event.sessionId != null)
-                        _buildDetailRow('Session ID', event.sessionId!),
-                      if (event.properties != null && event.properties!.isNotEmpty) ...[
+                      _buildDetailRow(
+                        'Type',
+                        _getTypeLabel(log.type),
+                        _getTypeColor(log.type),
+                      ),
+                      _buildDetailRow('Time', log.timestamp.toString(), null),
+                      if (log.notificationId != null)
+                        _buildDetailRow('Notification ID', log.notificationId!, null),
+                      if (log.title != null)
+                        _buildDetailRow('Title', log.title!, null),
+                      if (log.body != null)
+                        _buildDetailRow('Body', log.body!, null),
+                      if (log.wasTapped && log.tappedAt != null)
+                        _buildDetailRow('Tapped At', log.tappedAt!.toString(), Colors.green),
+                      if (log.payload != null && log.payload!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         const Text(
-                          'Properties',
+                          'Payload',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         const SizedBox(height: 8),
@@ -193,7 +207,7 @@ class _EventsScreenState extends State<EventsScreen> {
                             border: Border.all(color: Colors.grey[300]!),
                           ),
                           child: SelectableText(
-                            JsonEncoder.withIndent('  ').convert(event.properties),
+                            JsonEncoder.withIndent('  ').convert(log.payload),
                             style: const TextStyle(
                               fontFamily: 'monospace',
                               fontSize: 12,
@@ -212,45 +226,33 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String value, Color? valueColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 120,
             child: Text(
               '$label:',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
-            child: SelectableText(value),
+            child: SelectableText(
+              value,
+              style: TextStyle(color: valueColor),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Color _getSourceColor(String? source) {
-    if (source == null) return Colors.grey;
-    switch (source.toLowerCase()) {
-      case 'clevertap':
-        return Colors.blue;
-      case 'firebase':
-        return Colors.orange;
-      case 'custom':
-        return Colors.purple;
-      default:
-        return Colors.teal;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final events = _filteredEvents;
-    final sources = _availableSources;
+    final logs = _filteredLogs;
 
     return Column(
       children: [
@@ -260,7 +262,7 @@ class _EventsScreenState extends State<EventsScreen> {
           color: Colors.grey[100],
           child: TextField(
             decoration: InputDecoration(
-              hintText: 'Search events...',
+              hintText: 'Search notifications...',
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -277,45 +279,47 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
         ),
 
-        // Source filter chips
-        if (sources.isNotEmpty)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            color: Colors.grey[100],
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  FilterChip(
-                    label: const Text('All'),
-                    selected: _selectedSource == null,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedSource = null;
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ...sources.map((source) => Padding(
+        // Type filter chips
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          color: Colors.grey[100],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                FilterChip(
+                  label: const Text('All'),
+                  selected: _selectedType == null,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedType = null;
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ...NotificationType.values.map((type) {
+                  final isSelected = _selectedType == type;
+                  return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
-                      label: Text(source),
-                      selected: _selectedSource == source,
+                      label: Text(_getTypeLabel(type)),
+                      selected: isSelected,
                       onSelected: (selected) {
                         setState(() {
-                          _selectedSource = selected ? source : null;
+                          _selectedType = selected ? type : null;
                         });
                       },
-                      selectedColor: _getSourceColor(source).withOpacity(0.3),
-                      checkmarkColor: _getSourceColor(source),
+                      selectedColor: _getTypeColor(type).withAlpha(25),
+                      checkmarkColor: _getTypeColor(type),
                     ),
-                  )),
-                ],
-              ),
+                  );
+                }),
+              ],
             ),
           ),
+        ),
 
-        // Event count and actions
+        // Log count and actions
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           color: Colors.grey[200],
@@ -323,17 +327,11 @@ class _EventsScreenState extends State<EventsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${events.length} event${events.length != 1 ? 's' : ''}',
+                '${logs.length} notification${logs.length != 1 ? 's' : ''}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.table_chart),
-                    onPressed: _openEventValidation,
-                    tooltip: 'Validate with Google Sheets',
-                    color: Colors.green[700],
-                  ),
                   IconButton(
                     icon: const Icon(Icons.share),
                     onPressed: _shareAll,
@@ -355,21 +353,21 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
         ),
 
-        // Event list
+        // Log list
         Expanded(
-          child: events.isEmpty
+          child: logs.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.analytics_outlined,
+                        Icons.notifications_none,
                         size: 64,
                         color: Colors.grey[400],
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No events',
+                        'No notification logs',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -377,7 +375,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Analytics events will appear here',
+                        'Notification logs will appear here',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[500],
@@ -387,11 +385,11 @@ class _EventsScreenState extends State<EventsScreen> {
                   ),
                 )
               : ListView.builder(
-                  itemCount: events.length,
+                  itemCount: logs.length,
                   itemBuilder: (context, index) {
-                    final event = events[index];
+                    final log = logs[index];
                     return InkWell(
-                      onTap: () => _showEventDetail(event),
+                      onTap: () => _showLogDetail(log),
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -403,9 +401,9 @@ class _EventsScreenState extends State<EventsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              Icons.analytics,
-                              color: _getSourceColor(event.source),
-                              size: 20,
+                              _getTypeIcon(log.type),
+                              color: _getTypeColor(log.type),
+                              size: 24,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -414,42 +412,29 @@ class _EventsScreenState extends State<EventsScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      if (event.source != null) ...[
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getSourceColor(event.source),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            event.source!,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
                                         ),
-                                        const SizedBox(width: 8),
-                                      ],
-                                      Expanded(
+                                        decoration: BoxDecoration(
+                                          color: _getTypeColor(log.type),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
                                         child: Text(
-                                          event.name,
+                                          _getTypeLabel(log.type).toUpperCase(),
                                           style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
+                                      const Spacer(),
                                       Text(
-                                        '${event.timestamp.hour.toString().padLeft(2, '0')}:'
-                                        '${event.timestamp.minute.toString().padLeft(2, '0')}:'
-                                        '${event.timestamp.second.toString().padLeft(2, '0')}',
+                                        '${log.timestamp.hour.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.minute.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.second.toString().padLeft(2, '0')}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.grey[600],
@@ -457,12 +442,44 @@ class _EventsScreenState extends State<EventsScreen> {
                                       ),
                                     ],
                                   ),
-                                  if (event.properties != null && event.properties!.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  if (log.title != null) ...[
+                                    Text(
+                                      log.title!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                  ],
+                                  if (log.body != null)
+                                    Text(
+                                      log.body!,
+                                      style: const TextStyle(fontSize: 13),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  if (log.notificationId != null) ...[
                                     const SizedBox(height: 4),
                                     Text(
-                                      '${event.properties!.length} propert${event.properties!.length != 1 ? 'ies' : 'y'}',
+                                      'ID: ${log.notificationId}',
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                  if (log.payload != null && log.payload!.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
+                                      style: TextStyle(
+                                        fontSize: 11,
                                         color: Colors.grey[600],
                                       ),
                                     ),

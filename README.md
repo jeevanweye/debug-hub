@@ -1,470 +1,258 @@
-# DebugHub 🚀
+# DebugHub 🐛
+
+A comprehensive Flutter debugging tool built with **Clean Architecture** and **SOLID Principles** that makes debugging effortless with minimal integration code.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
+  <img src="https://img.shields.io/badge/Flutter-3.9+-blue.svg" alt="Flutter Version">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/Architecture-Clean-brightgreen.svg" alt="Clean Architecture">
+  <img src="https://img.shields.io/badge/SOLID-Principles-blue.svg" alt="SOLID Principles">
 </p>
-
-**DebugHub** is a comprehensive Flutter debugging tool inspired by [CocoaDebug](https://github.com/CocoaDebug/CocoaDebug) for iOS. It provides an in-app debugging interface that helps developers monitor network requests, logs, crashes, storage, and device information - all without leaving your app!
 
 ## ✨ Features
 
-### 🌐 Network Monitoring
-- **Capture all HTTP/HTTPS requests** (supports `http` and `dio` packages)
-- View request/response headers and bodies
-- Beautiful JSON formatting
-- Filter by status (success, error, pending)
-- Search by URL or method
-- Share network logs via email or copy to clipboard
-- Request/response size tracking
-- Duration measurement
+- 🌐 **Network Monitoring** - Capture and inspect all HTTP requests/responses
+- 📝 **Log Tracking** - View all app logs with filtering and search
+- 💥 **Crash Reporting** - Track non-fatal crashes and errors
+- 📊 **Event Tracking** - Monitor analytics events (Firebase, CleverTap, etc.)
+- 🔔 **Notification Logging** - Track notifications received and tapped
+- 📱 **Device Info** - View device and app information
+- 💾 **Persistent Storage** - Data persists across app restarts
+- 🎨 **Customizable UI** - Theme colors and configuration options
+- 🔍 **Search & Filter** - Find what you need quickly
+- 📤 **Share Data** - Export debug data easily
 
-### 📝 Log Management
-- Capture all app logs with different levels (verbose, debug, info, warning, error, wtf)
-- Filter logs by level
-- Search logs by keyword or tag
-- Long press to view full log details with stack traces
-- Copy logs to clipboard
-- Share logs via email
+## 🚀 Quick Start
 
-### 💥 Crash Reporting
-- Automatic crash detection
-- Stack trace capture
-- Manual crash reporting
-- View crash history
-- Share crash reports
+### 1. Add Dependency
 
-### 📁 Storage Browser
-- Browse app documents directory
-- View file sizes
-- Navigate through folders
-- Storage usage statistics
-
-### 📱 Device & App Information
-- App version and build number
-- Device model and OS version
-- Platform information
-- Flutter and Dart version
-- Copy any info to clipboard
-
-### 🎯 User Experience
-- **Floating bubble** - Draggable debug button, always visible in debug mode
-- **Long press bubble** - Clear all debug data
-- **Beautiful UI** - Modern Material Design 3
-- **Customizable theme** - Set your own main color
-- **No performance impact** - Lightweight and efficient
-- **Optional shake gesture** - Can be enabled to show/hide bubble
-
-## 📸 Screenshots
-
-*Coming soon - Run the app to see it in action!*
-
-## 🚀 Getting Started
-
-### Installation
-
-#### As a Plugin in Your Flutter Project
-
-1. **Copy the DebugHub packages** to your project:
-```bash
-# Copy the entire packages folder to your project
-cp -r packages/ your_project/packages/
-```
-
-2. **Add to your `pubspec.yaml`**:
 ```yaml
 dependencies:
-  debug_hub_ui:
-    path: packages/debug_hub_ui
-  base:
-    path: packages/base
-  network:
-    path: packages/network
-  log:
-    path: packages/log
-  storage:
-    path: packages/storage
-  non_fatal:
-    path: packages/non_fatal
+  debug_hub:
+    path: path/to/DebugHub
 ```
 
-3. **Run**:
-```bash
-flutter pub get
-```
-
-### Basic Usage
-
-#### 1. Initialize DebugHub in your `main.dart`:
+### 2. Initialize (3 lines of code!)
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:debug_hub_ui/debug_hub_ui.dart';
+import 'package:debug_hub/debug_hub.dart';
 
-void main() {
-  // Initialize DebugHub with configuration
-  DebugHub().init(
-    config: const DebugHubConfig(
-      serverURL: 'https://api.yourserver.com', // Optional: Highlight your server URL
-      mainColor: Color(0xFF42d459), // Optional: Customize theme color
-      enableShakeGesture: false, // Keep bubble always visible (default)
-      enableLogMonitoring: true,
-      enableNetworkMonitoring: true,
-      enableCrashMonitoring: true,
-      showBubbleOnStart: true,
-    ),
-  );
-
-  // Enable DebugHub
-  DebugHub().enable();
-
-  runApp(const MyApp());
-}
-```
-
-#### 2. Wrap your app with DebugHub:
-
-```dart
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Your App',
-      navigatorKey: DebugHub().navigatorKey,
-      home: const YourHomePage(),
-      builder: (context, child) {
-        return DebugHub().wrap(child ?? const SizedBox.shrink());
-      },
-    );
-  }
-}
-```
-
-That's it! The floating debug bubble will appear in your app.
-
-## 📚 Advanced Usage
-
-### Network Monitoring
-
-#### Using with `http` package:
-
-```dart
-import 'package:network/network.dart';
-import 'package:http/http.dart' as http;
-
-final networkInterceptor = NetworkInterceptor();
-
-Future<void> makeRequest() async {
-  // Capture request
-  final requestId = networkInterceptor.captureRequest(
-    url: 'https://api.example.com/data',
-    method: 'GET',
-    headers: {'Content-Type': 'application/json'},
-  );
-
-  final startTime = DateTime.now();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   
-  // Make actual request
-  final response = await http.get(
-    Uri.parse('https://api.example.com/data'),
-  );
-
-  // Capture response
-  networkInterceptor.captureResponse(
-    id: requestId,
-    statusCode: response.statusCode,
-    responseBody: response.body,
-    responseHeaders: response.headers.map((k, v) => MapEntry(k, v)),
-    duration: DateTime.now().difference(startTime),
-  );
+  await DebugHubManager.initialize();  // Initialize
+  
+  runApp(DebugHubManager.wrap(MyApp()));  // Wrap your app
 }
 ```
 
-#### Using with `dio` package:
+### 3. Done! 🎉
+
+That's it! DebugHub is now active with a floating debug bubble.
+
+## 📱 Screenshots
+
+The UI includes:
+- **Network Tab** - View all API calls with request/response details
+- **Logs Tab** - Filter logs by level (Verbose, Debug, Info, Warning, Error)
+- **Non-Fatal Tab** - Track crashes with stack traces
+- **Events Tab** - Monitor analytics events with properties
+- **Notifications Tab** - See all notifications received and tapped
+- **App Info Tab** - Device and app information
+
+## 🎯 Usage Examples
+
+### Basic Logging
+
+```dart
+import 'package:debug_hub/debug_hub.dart';
+
+// Log a message
+DebugHubManager.log('User logged in', tag: 'Auth');
+
+// Log an error
+DebugHubManager.logError('Failed to load', error: e, stackTrace: s);
+```
+
+### Track Events
+
+```dart
+// Track analytics event
+DebugHubManager.trackEvent('button_click', properties: {
+  'screen': 'home',
+  'button': 'submit',
+});
+```
+
+### Log Notifications
+
+```dart
+// When notification received
+DebugHubManager.logNotification(
+  title: 'New Message',
+  body: 'You have a new message',
+  payload: {'message_id': '123'},
+);
+
+// When notification tapped
+DebugHubManager.logNotificationTap(
+  notificationId: 'notification_123',
+  title: 'New Message',
+);
+```
+
+### Report Crashes
+
+```dart
+try {
+  // Your code
+} catch (e, stackTrace) {
+  DebugHubSimple.reportCrash(e, stackTrace);
+}
+```
+
+## 🎨 Customization
+
+```dart
+await DebugHubSimple.init(
+  serverURL: 'https://api.example.com',  // Highlight your API
+  mainColor: Colors.blue,                 // Custom theme
+  showBubbleOnStart: true,                // Show bubble
+  ignoredURLs: ['analytics.google.com'], // URLs to ignore
+);
+```
+
+## 🔌 Integrations
+
+### Dio (Network Monitoring)
 
 ```dart
 import 'package:dio/dio.dart';
 import 'package:network/network.dart';
 
 final dio = Dio();
-dio.interceptors.add(DebugDioInterceptor());
-
-// All requests will be automatically captured
-final response = await dio.get('https://api.example.com/data');
+dio.interceptors.add(DebugHubDioInterceptor());
 ```
 
-### Logging
+### Firebase Cloud Messaging
 
 ```dart
-import 'package:base/base.dart';
-
-final storage = DebugStorage();
-
-// Add different log levels
-storage.addLog(
-  DebugLog.create(
-    level: LogLevel.info,
-    message: 'User logged in successfully',
-    tag: 'Auth',
-  ),
-);
-
-storage.addLog(
-  DebugLog.create(
-    level: LogLevel.error,
-    message: 'Failed to load data',
-    tag: 'API',
-    error: exception,
-    stackTrace: stackTrace,
-  ),
-);
+FirebaseMessaging.onMessage.listen((message) {
+  DebugHubSimple.logNotification(
+    title: message.notification?.title,
+    body: message.notification?.body,
+    payload: message.data,
+  );
+});
 ```
 
-### Crash Reporting
+### Error Handling
 
 ```dart
-import 'package:non_fatal/non_fatal.dart';
-
-// Manual crash reporting
-CrashHandler().reportError(
-  error,
-  stackTrace: stackTrace,
-  context: 'User action context',
-  isFatal: false,
-);
+FlutterError.onError = (details) {
+  DebugHubSimple.reportCrash(details.exception, details.stack);
+};
 ```
 
-## ⚙️ Configuration Options
-
-```dart
-DebugHubConfig(
-  // Server URL to highlight in network requests
-  serverURL: 'https://api.yourserver.com',
-  
-  // URLs to ignore from capturing
-  ignoredURLs: ['https://analytics.com'],
-  
-  // Only capture these URLs
-  onlyURLs: ['https://api.yourserver.com'],
-  
-  // Log prefixes to ignore
-  ignoredPrefixLogs: ['[VERBOSE]'],
-  
-  // Only capture logs with these prefixes
-  onlyPrefixLogs: ['[APP]'],
-  
-  // Add custom tab
-  additionalTab: YourCustomWidget(),
-  additionalTabLabel: 'Custom',
-  additionalTabIcon: Icons.extension,
-  
-  // Email recipients for sharing
-  emailToRecipients: ['dev@example.com'],
-  emailCcRecipients: ['qa@example.com'],
-  
-  // Theme color
-  mainColor: Color(0xFF42d459),
-  
-  // Feature toggles
-  enableShakeGesture: true,
-  enableLogMonitoring: true,
-  enableNetworkMonitoring: true,
-  enableCrashMonitoring: true,
-  showBubbleOnStart: true,
-  
-  // Limits
-  maxLogs: 1000,
-  maxNetworkRequests: 500,
-  
-  // Bubble position
-  bubbleAlignment: Alignment.bottomRight,
-  
-  // Performance monitoring
-  enablePerformanceMonitoring: true,
-)
-```
-
-## 🏗️ Architecture
+## 📦 Architecture
 
 DebugHub is built with a modular architecture:
 
 ```
-packages/
-├── base/              # Core models and storage
-│   ├── models/        # Data models (NetworkRequest, DebugLog, CrashReport)
-│   ├── storage/       # In-memory storage
-│   └── utils/         # Utilities (JSON formatter, date formatter)
-├── network/           # Network monitoring
-│   ├── interceptors/  # HTTP and Dio interceptors
-│   └── handlers/      # Request/response handling
-├── log/               # Log capture
-│   └── interceptors/  # Log interception
-├── storage/           # File browser
-│   └── utils/         # File system utilities
-├── non_fatal/         # Crash reporting
-│   └── handlers/      # Error handlers
-└── debug_hub_ui/      # UI components
-    ├── screens/       # All UI screens
-    ├── widgets/       # Reusable widgets
-    └── config/        # Configuration
+debug_hub/
+├── packages/
+│   ├── base/           # Core models and storage
+│   ├── network/        # Network monitoring
+│   ├── log/            # Log tracking
+│   ├── events/         # Event tracking
+│   ├── notification/   # Notification logging
+│   ├── non_fatal/      # Crash reporting
+│   └── debug_hub_ui/   # UI components
+├── lib/
+│   ├── debug_hub.dart         # Main export
+│   └── debug_hub_simple.dart  # Simplified API
+└── example/            # Example app
 ```
 
-## 🎯 Use Cases
+## 🛡️ Production Safety
 
-### Development
-- Debug network issues in real-time
-- Monitor app logs without connecting to IDE
-- Test error handling
-- Inspect app storage
-
-### QA Testing
-- Share detailed bug reports with network logs
-- Capture crash information
-- Verify API responses
-- Check device-specific issues
-
-### Production Debugging (Debug builds only)
-- Investigate user-reported issues
-- Monitor network performance
-- Track error patterns
-
-## ⚠️ Important Notes
-
-1. **Never ship DebugHub in production builds!** Always use it only in debug mode:
-```dart
-void main() {
-  if (kDebugMode) {
-    DebugHub().init();
-    DebugHub().enable();
-  }
-  runApp(const MyApp());
-}
-```
-
-2. **Performance**: DebugHub is designed to be lightweight, but it does store data in memory. Use the provided limits to prevent memory issues.
-
-3. **Privacy**: Be careful when sharing debug data - it may contain sensitive information like API keys or user data.
-
-## 🔧 Development
-
-### Running the Example App
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd DebugHub
-
-# Get dependencies
-flutter pub get
-
-# Run the app
-flutter run
-```
-
-### Building for Release
-
-Make sure to disable DebugHub in release builds:
+DebugHub automatically disables itself in release builds. No need to remove code!
 
 ```dart
-import 'package:flutter/foundation.dart';
-
-void main() {
-  if (kDebugMode) {
-    DebugHub().init();
-    DebugHub().enable();
-  }
-  runApp(const MyApp());
-}
+// Safe in production - won't run in release mode
+await DebugHubManager.initialize();
 ```
 
-## 📦 Package Structure
+## 📖 Documentation
 
-- **base**: Core functionality and data models
-- **network**: Network request interception and monitoring
-- **log**: Log capture and management
-- **storage**: File system browser
-- **non_fatal**: Crash and error reporting
-- **events**: Event tracking (future feature)
-- **notification**: Notification monitoring (future feature)
-- **debug_hub_ui**: Main UI package with all screens and widgets
+- [Integration Guide](INTEGRATION_GUIDE.md) - Detailed setup instructions
+- [API Reference](lib/debug_hub_interface.dart) - Complete API documentation
+- [Example App](example/) - Working example
+
+## 🎓 Best Practices
+
+1. ✅ Initialize early in `main()`
+2. ✅ Wrap your app with `DebugHubManager.wrap()`
+3. ✅ Use tags for better log organization
+4. ✅ Track important user actions
+5. ✅ Always report non-fatal errors
+6. ✅ Test in debug mode only
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- Inspired by [CocoaDebug](https://github.com/CocoaDebug/CocoaDebug) for iOS
-- Built with ❤️ using Flutter
+For issues or questions:
+1. Check the [Integration Guide](INTEGRATION_GUIDE.md)
+2. Review the [Example App](example/)
+3. Open an issue on GitHub
 
-## 📞 Support
+## 🌟 Features Comparison
 
-If you have any questions or issues, please open an issue on GitHub.
+| Feature | DebugHub | Other Tools |
+|---------|----------|-------------|
+| Network Monitoring | ✅ | ✅ |
+| Log Tracking | ✅ | ✅ |
+| Crash Reporting | ✅ | ✅ |
+| Event Tracking | ✅ | ❌ |
+| Notification Logging | ✅ | ❌ |
+| Persistent Storage | ✅ | ❌ |
+| Bottom Navigation | ✅ | ❌ |
+| Minimal Code | ✅ (3 lines) | ❌ |
+| Auto-disable in Release | ✅ | ✅ |
+| Clean Architecture | ✅ | ❌ |
+| SOLID Principles | ✅ | ❌ |
+| Interface-Based Design | ✅ | ❌ |
+| Easy to Test | ✅ | ⚠️ |
+| Well Documented | ✅ | ⚠️ |
 
----
+## 🚀 Roadmap
 
-## 🎨 Customization Examples
-
-### Custom Theme
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    mainColor: Color(0xFFFF5722), // Orange theme
-  ),
-);
-```
-
-### Filter Specific URLs
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    serverURL: 'https://api.myapp.com',
-    ignoredURLs: [
-      'https://analytics.google.com',
-      'https://crashlytics.com',
-    ],
-  ),
-);
-```
-
-### Add Custom Tab
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    additionalTab: MyCustomDebugScreen(),
-    additionalTabLabel: 'Custom',
-    additionalTabIcon: Icons.settings,
-  ),
-);
-```
-
-## 🚦 Roadmap
-
-- [ ] WebSocket monitoring
-- [ ] GraphQL support
-- [ ] Performance metrics
-- [ ] Memory profiling
-- [ ] Widget inspector
-- [ ] Timeline view
-- [ ] Export to file
+### Features
+- [ ] Web support
+- [ ] Desktop support
 - [ ] Remote debugging
-- [ ] Plugin system
+- [ ] Performance monitoring
+- [ ] Custom plugins API
+- [ ] Export to file formats (CSV, JSON)
 
-## 💡 Tips
-
-1. **Always Visible**: The debug bubble stays visible in debug mode for easy access
-2. **Long Press**: Long press the bubble to clear all debug data
-3. **Search**: Use the search feature in Network and Logs tabs to quickly find what you need
-4. **Share**: Use the share button to send debug data via email or other apps
-5. **Copy**: Tap the copy icon to copy specific data to clipboard
-6. **Optional Shake**: Set `enableShakeGesture: true` if you want to hide/show bubble with shake
+### Architecture Improvements
+- [ ] Add explicit Use Cases layer
+- [ ] Integrate state management (Riverpod/Bloc)
+- [ ] Add Dependency Injection container (GetIt)
+- [ ] Comprehensive unit tests (>80% coverage)
+- [ ] Widget tests for UI components
 
 ---
 
-Made with 💚 for Flutter developers
+**Made with ❤️ for Flutter developers**
+
+*Debug smarter, not harder!* 🐛✨

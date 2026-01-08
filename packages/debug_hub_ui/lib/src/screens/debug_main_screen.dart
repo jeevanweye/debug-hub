@@ -4,6 +4,7 @@ import 'network_screen.dart';
 import 'logs_screen.dart';
 import 'crashes_screen.dart';
 import 'events_screen.dart';
+import 'notifications_screen.dart';
 import 'app_info_screen.dart';
 
 class DebugMainScreen extends StatefulWidget {
@@ -18,21 +19,51 @@ class DebugMainScreen extends StatefulWidget {
   State<DebugMainScreen> createState() => _DebugMainScreenState();
 }
 
-class _DebugMainScreenState extends State<DebugMainScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DebugMainScreenState extends State<DebugMainScreen> {
+  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    final tabCount = widget.config.additionalTab != null ? 6 : 5;
-    _tabController = TabController(length: tabCount, vsync: this);
-  }
+  List<Widget> get _screens => [
+    NetworkScreen(config: widget.config),
+    LogsScreen(config: widget.config),
+    CrashesScreen(config: widget.config),
+    EventsScreen(config: widget.config),
+    NotificationsScreen(config: widget.config),
+    AppInfoScreen(config: widget.config),
+    if (widget.config.additionalTab != null)
+      widget.config.additionalTab!,
+  ];
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  List<BottomNavigationBarItem> get _navItems => [
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.network_check),
+      label: 'Network',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.article),
+      label: 'Logs',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.warning_amber),
+      label: 'Non-Fatal',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.analytics),
+      label: 'Events',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.notifications),
+      label: 'Notifications',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.info),
+      label: 'App Info',
+    ),
+    if (widget.config.additionalTab != null)
+      BottomNavigationBarItem(
+        icon: Icon(widget.config.additionalTabIcon ?? Icons.extension),
+        label: widget.config.additionalTabLabel ?? 'Custom',
+      ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,37 +72,25 @@ class _DebugMainScreenState extends State<DebugMainScreen> with SingleTickerProv
         title: const Text('DebugHub'),
         backgroundColor: widget.config.mainColor,
         foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: [
-            const Tab(icon: Icon(Icons.network_check), text: 'Network'),
-            const Tab(icon: Icon(Icons.article), text: 'Logs'),
-            const Tab(icon: Icon(Icons.warning_amber), text: 'Non-Fatal'),
-            const Tab(icon: Icon(Icons.analytics), text: 'Events'),
-            const Tab(icon: Icon(Icons.info), text: 'App Info'),
-            if (widget.config.additionalTab != null)
-              Tab(
-                icon: Icon(widget.config.additionalTabIcon ?? Icons.extension),
-                text: widget.config.additionalTabLabel ?? 'Custom',
-              ),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          NetworkScreen(config: widget.config),
-          LogsScreen(config: widget.config),
-          CrashesScreen(config: widget.config),
-          EventsScreen(config: widget.config),
-          AppInfoScreen(config: widget.config),
-          if (widget.config.additionalTab != null)
-            widget.config.additionalTab!,
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: _navItems,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: widget.config.mainColor,
+        unselectedItemColor: Colors.grey,
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
+        showUnselectedLabels: true,
       ),
     );
   }
