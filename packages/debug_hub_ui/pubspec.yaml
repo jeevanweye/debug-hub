@@ -1,0 +1,39 @@
+name: debug_hub_ui
+description: UI components for DebugHub - Flutter debugging tool
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  base:
+    path: ../base
+  network:
+    path: ../network
+  log:
+    path: ../log
+  storage:
+    path: ../storage
+  non_fatal:
+    path: ../non_fatal
+  events:
+    path: ../events
+  notification:
+    path: ../notification
+  
+  # Additional dependencies
+  device_info_plus: ^10.1.2
+  package_info_plus: ^8.0.3
+  share_plus: ^10.0.2
+  path_provider: ^2.1.4
+  sensors_plus: ^6.0.1
+  flutter_slidable: ^3.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
