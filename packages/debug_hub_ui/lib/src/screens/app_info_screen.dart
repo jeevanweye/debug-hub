@@ -9,10 +9,7 @@ import '../debug_hub_config.dart';
 class AppInfoScreen extends StatefulWidget {
   final DebugHubConfig config;
 
-  const AppInfoScreen({
-    super.key,
-    required this.config,
-  });
+  const AppInfoScreen({super.key, required this.config});
 
   @override
   State<AppInfoScreen> createState() => _AppInfoScreenState();
@@ -36,7 +33,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     final storage = DebugStorage();
     final size = await storage.getStorageSizeFormatted();
     final counts = await storage.getItemCounts();
-    
+
     if (mounted) {
       setState(() {
         _storageSize = size;
@@ -57,7 +54,8 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
           'Platform': 'Android',
           'Device': androidInfo.model,
           'Manufacturer': androidInfo.manufacturer,
-          'OS Version': 'Android ${androidInfo.version.release} (SDK ${androidInfo.version.sdkInt})',
+          'OS Version':
+              'Android ${androidInfo.version.release} (SDK ${androidInfo.version.sdkInt})',
           'Brand': androidInfo.brand,
           'Product': androidInfo.product,
           'Hardware': androidInfo.hardware,
@@ -85,18 +83,18 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading info: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading info: $e')));
       }
     }
   }
 
   void _copyToClipboard(String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$label copied to clipboard')));
   }
 
   void _copyAllInfo() {
@@ -104,7 +102,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     buffer.writeln('DebugHub App Information');
     buffer.writeln('=' * 50);
     buffer.writeln();
-    
+
     if (_packageInfo != null) {
       buffer.writeln('Application Info:');
       buffer.writeln('  App Name: ${_packageInfo!.appName}');
@@ -113,7 +111,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       buffer.writeln('  Build Number: ${_packageInfo!.buildNumber}');
       buffer.writeln();
     }
-    
+
     if (_deviceInfo != null) {
       buffer.writeln('Device Info:');
       _deviceInfo!.forEach((key, value) {
@@ -121,7 +119,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       });
       buffer.writeln();
     }
-    
+
     buffer.writeln('Flutter Info:');
     buffer.writeln('  Dart Version: ${Platform.version}');
     buffer.writeln('  Platform: ${Platform.operatingSystem}');
@@ -207,83 +205,96 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Actions
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('App Info'),
+        backgroundColor: widget.config.mainColor,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.white,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
           children: [
-            ElevatedButton.icon(
-              onPressed: _copyAllInfo,
-              icon: const Icon(Icons.copy),
-              label: const Text('Copy All'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: widget.config.mainColor,
-                foregroundColor: Colors.white,
+            // Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _copyAllInfo,
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy All'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widget.config.mainColor,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Storage Info Card (at top)
+            _buildStorageCard(),
+            const SizedBox(height: 16),
+
+            // App Info
+            if (_packageInfo != null) ...[
+              _buildInfoCard(
+                title: 'Application',
+                icon: Icons.apps,
+                items: [
+                  _InfoItem('App Name', _packageInfo!.appName),
+                  _InfoItem('Package Name', _packageInfo!.packageName),
+                  _InfoItem('Version', _packageInfo!.version),
+                  _InfoItem('Build Number', _packageInfo!.buildNumber),
+                ],
               ),
+              const SizedBox(height: 16),
+            ],
+
+            // Device Info
+            if (_deviceInfo != null) ...[
+              _buildInfoCard(
+                title: 'Device',
+                icon: Icons.phone_android,
+                items: _deviceInfo!.entries
+                    .map((e) => _InfoItem(e.key, e.value.toString()))
+                    .toList(),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Flutter Info
+            _buildInfoCard(
+              title: 'Flutter',
+              icon: Icons.flutter_dash,
+              items: [
+                _InfoItem('Dart Version', Platform.version.split(' ')[0]),
+                _InfoItem('Platform', Platform.operatingSystem),
+                _InfoItem('OS Version', Platform.operatingSystemVersion),
+                _InfoItem(
+                  'Number of Processors',
+                  Platform.numberOfProcessors.toString(),
+                ),
+                _InfoItem('Path Separator', Platform.pathSeparator),
+                _InfoItem('Locale', Platform.localeName),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Environment Info
+            _buildInfoCard(
+              title: 'Environment',
+              icon: Icons.settings,
+              items: [
+                _InfoItem('Script', Platform.script.toString()),
+                _InfoItem('Executable', Platform.executable),
+                _InfoItem('Resolved Executable', Platform.resolvedExecutable),
+              ],
             ),
           ],
         ),
-        const SizedBox(height: 8),
-
-        // Storage Info Card (at top)
-        _buildStorageCard(),
-        const SizedBox(height: 16),
-
-        // App Info
-        if (_packageInfo != null) ...[
-          _buildInfoCard(
-            title: 'Application',
-            icon: Icons.apps,
-            items: [
-              _InfoItem('App Name', _packageInfo!.appName),
-              _InfoItem('Package Name', _packageInfo!.packageName),
-              _InfoItem('Version', _packageInfo!.version),
-              _InfoItem('Build Number', _packageInfo!.buildNumber),
-            ],
-          ),
-          const SizedBox(height: 16),
-        ],
-
-        // Device Info
-        if (_deviceInfo != null) ...[
-          _buildInfoCard(
-            title: 'Device',
-            icon: Icons.phone_android,
-            items: _deviceInfo!.entries
-                .map((e) => _InfoItem(e.key, e.value.toString()))
-                .toList(),
-          ),
-          const SizedBox(height: 16),
-        ],
-
-        // Flutter Info
-        _buildInfoCard(
-          title: 'Flutter',
-          icon: Icons.flutter_dash,
-          items: [
-            _InfoItem('Dart Version', Platform.version.split(' ')[0]),
-            _InfoItem('Platform', Platform.operatingSystem),
-            _InfoItem('OS Version', Platform.operatingSystemVersion),
-            _InfoItem('Number of Processors', Platform.numberOfProcessors.toString()),
-            _InfoItem('Path Separator', Platform.pathSeparator),
-            _InfoItem('Locale', Platform.localeName),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        // Environment Info
-        _buildInfoCard(
-          title: 'Environment',
-          icon: Icons.settings,
-          items: [
-            _InfoItem('Script', Platform.script.toString()),
-            _InfoItem('Executable', Platform.executable),
-            _InfoItem('Resolved Executable', Platform.resolvedExecutable),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
@@ -313,42 +324,45 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
               ],
             ),
             const Divider(height: 24),
-            ...items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 140,
-                    child: Text(
-                      item.label,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
+            ...items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 140,
+                      child: Text(
+                        item.label,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SelectableText(
-                            item.value,
-                            style: const TextStyle(color: Colors.black87),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: SelectableText(
+                              item.value,
+                              style: const TextStyle(color: Colors.black87),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.copy, size: 16),
-                          onPressed: () => _copyToClipboard(item.value, item.label),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
+                          IconButton(
+                            icon: const Icon(Icons.copy, size: 16),
+                            onPressed: () =>
+                                _copyToClipboard(item.value, item.label),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
           ],
         ),
       ),
@@ -372,10 +386,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
                 const SizedBox(width: 8),
                 const Text(
                   'Debug Storage',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -432,10 +443,26 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildStorageChip('Logs', _itemCounts['logs'] ?? 0, Icons.article),
-                _buildStorageChip('Network', _itemCounts['network'] ?? 0, Icons.network_check),
-                _buildStorageChip('Crashes', _itemCounts['crashes'] ?? 0, Icons.warning_amber),
-                _buildStorageChip('Events', _itemCounts['events'] ?? 0, Icons.analytics),
+                _buildStorageChip(
+                  'Logs',
+                  _itemCounts['logs'] ?? 0,
+                  Icons.article,
+                ),
+                _buildStorageChip(
+                  'Network',
+                  _itemCounts['network'] ?? 0,
+                  Icons.network_check,
+                ),
+                _buildStorageChip(
+                  'Crashes',
+                  _itemCounts['crashes'] ?? 0,
+                  Icons.warning_amber,
+                ),
+                _buildStorageChip(
+                  'Events',
+                  _itemCounts['events'] ?? 0,
+                  Icons.analytics,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -474,4 +501,3 @@ class _InfoItem {
 
   _InfoItem(this.label, this.value);
 }
-

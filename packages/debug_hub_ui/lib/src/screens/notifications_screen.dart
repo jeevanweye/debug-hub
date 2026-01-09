@@ -8,10 +8,7 @@ import '../debug_hub_config.dart';
 class NotificationsScreen extends StatefulWidget {
   final DebugHubConfig config;
 
-  const NotificationsScreen({
-    super.key,
-    required this.config,
-  });
+  const NotificationsScreen({super.key, required this.config});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -28,9 +25,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       logs = logs.where((log) {
-        return (log.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
-            (log.body?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
-            (log.notificationId?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
+        return (log.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+                false) ||
+            (log.body?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+                false) ||
+            (log.notificationId?.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ??
+                false);
       }).toList();
     }
 
@@ -74,7 +76,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Notification Logs'),
-        content: const Text('Are you sure you want to clear all notification logs?'),
+        content: const Text(
+          'Are you sure you want to clear all notification logs?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -111,8 +115,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     buffer.writeln();
 
     for (var log in logs) {
-      buffer.writeln('[${_getTypeLabel(log.type).toUpperCase()}] ${log.timestamp}');
-      if (log.notificationId != null) buffer.writeln('ID: ${log.notificationId}');
+      buffer.writeln(
+        '[${_getTypeLabel(log.type).toUpperCase()}] ${log.timestamp}',
+      );
+      if (log.notificationId != null)
+        buffer.writeln('ID: ${log.notificationId}');
       if (log.title != null) buffer.writeln('Title: ${log.title}');
       if (log.body != null) buffer.writeln('Body: ${log.body}');
       if (log.payload != null && log.payload!.isNotEmpty) {
@@ -157,11 +164,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           onPressed: () {
                             Clipboard.setData(
                               ClipboardData(
-                                text: JsonEncoder.withIndent('  ').convert(log.toJson()),
+                                text: JsonEncoder.withIndent(
+                                  '  ',
+                                ).convert(log.toJson()),
                               ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Notification log copied to clipboard')),
+                              const SnackBar(
+                                content: Text(
+                                  'Notification log copied to clipboard',
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -185,18 +198,29 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ),
                       _buildDetailRow('Time', log.timestamp.toString(), null),
                       if (log.notificationId != null)
-                        _buildDetailRow('Notification ID', log.notificationId!, null),
+                        _buildDetailRow(
+                          'Notification ID',
+                          log.notificationId!,
+                          null,
+                        ),
                       if (log.title != null)
                         _buildDetailRow('Title', log.title!, null),
                       if (log.body != null)
                         _buildDetailRow('Body', log.body!, null),
                       if (log.wasTapped && log.tappedAt != null)
-                        _buildDetailRow('Tapped At', log.tappedAt!.toString(), Colors.green),
+                        _buildDetailRow(
+                          'Tapped At',
+                          log.tappedAt!.toString(),
+                          Colors.green,
+                        ),
                       if (log.payload != null && log.payload!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         const Text(
                           'Payload',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -240,10 +264,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
           Expanded(
-            child: SelectableText(
-              value,
-              style: TextStyle(color: valueColor),
-            ),
+            child: SelectableText(value, style: TextStyle(color: valueColor)),
           ),
         ],
       ),
@@ -254,255 +275,244 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final logs = _filteredLogs;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            color: Colors.grey[100],
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search notifications...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+    return Column(
+      children: [
+        // Search bar
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          color: Colors.grey[100],
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search notifications...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
             ),
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
           ),
+        ),
 
-          // Type filter chips
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            color: Colors.grey[100],
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  FilterChip(
-                    label: const Text('All'),
-                    selected: _selectedType == null,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedType = null;
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ...NotificationType.values.map((type) {
-                    final isSelected = _selectedType == type;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(_getTypeLabel(type)),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedType = selected ? type : null;
-                          });
-                        },
-                        selectedColor: _getTypeColor(type).withAlpha(25),
-                        checkmarkColor: _getTypeColor(type),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-          ),
-
-          // Log count and actions
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.grey[200],
+        // Type filter chips
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          color: Colors.grey[100],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${logs.length} notification${logs.length != 1 ? 's' : ''}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                FilterChip(
+                  label: const Text('All'),
+                  selected: _selectedType == null,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedType = null;
+                    });
+                  },
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      onPressed: _shareAll,
-                      tooltip: 'Share all',
+                const SizedBox(width: 8),
+                ...NotificationType.values.map((type) {
+                  final isSelected = _selectedType == type;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(_getTypeLabel(type)),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedType = selected ? type : null;
+                        });
+                      },
+                      selectedColor: _getTypeColor(type).withAlpha(25),
+                      checkmarkColor: _getTypeColor(type),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: _clearAll,
-                      tooltip: 'Clear all',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () => setState(() {}),
-                      tooltip: 'Refresh',
-                    ),
-                  ],
-                ),
+                  );
+                }),
               ],
             ),
           ),
+        ),
 
-          // Log list
-          Expanded(
-            child: logs.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_none,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No notification logs',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Notification logs will appear here',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: logs.length,
-                    itemBuilder: (context, index) {
-                      final log = logs[index];
-                      return InkWell(
-                        onTap: () => _showLogDetail(log),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey[300]!),
-                            ),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                _getTypeIcon(log.type),
-                                color: _getTypeColor(log.type),
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getTypeColor(log.type),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            _getTypeLabel(log.type).toUpperCase(),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          '${log.timestamp.hour.toString().padLeft(2, '0')}:'
-                                          '${log.timestamp.minute.toString().padLeft(2, '0')}:'
-                                          '${log.timestamp.second.toString().padLeft(2, '0')}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    if (log.title != null) ...[
-                                      Text(
-                                        log.title!,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 2),
-                                    ],
-                                    if (log.body != null)
-                                      Text(
-                                        log.body!,
-                                        style: const TextStyle(fontSize: 13),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    if (log.notificationId != null) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'ID: ${log.notificationId}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                    if (log.payload != null && log.payload!.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+        // Log count and actions
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Colors.grey[200],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${logs.length} notification${logs.length != 1 ? 's' : ''}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: _shareAll,
+                    tooltip: 'Share all',
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: _clearAll,
+                    tooltip: 'Clear all',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => setState(() {}),
+                    tooltip: 'Refresh',
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+
+        // Log list
+        Expanded(
+          child: logs.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.notifications_none,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No notification logs',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Notification logs will appear here',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: logs.length,
+                  itemBuilder: (context, index) {
+                    final log = logs[index];
+                    return InkWell(
+                      onTap: () => _showLogDetail(log),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: Colors.grey[300]!),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              _getTypeIcon(log.type),
+                              color: _getTypeColor(log.type),
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _getTypeColor(log.type),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          _getTypeLabel(log.type).toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        '${log.timestamp.hour.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.minute.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.second.toString().padLeft(2, '0')}',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  if (log.title != null) ...[
+                                    Text(
+                                      log.title!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                  ],
+                                  if (log.body != null)
+                                    Text(
+                                      log.body!,
+                                      style: const TextStyle(fontSize: 13),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  if (log.notificationId != null) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'ID: ${log.notificationId}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                  if (log.payload != null &&
+                                      log.payload!.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }
-

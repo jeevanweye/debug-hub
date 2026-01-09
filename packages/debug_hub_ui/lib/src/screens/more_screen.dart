@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../debug_hub_config.dart';
 import 'app_info_screen.dart';
-import 'notifications_screen.dart';
+import 'crashes_screen.dart';
+import 'package:base/base.dart';
 
 class MoreScreen extends StatelessWidget {
   final DebugHubConfig config;
@@ -20,14 +21,14 @@ class MoreScreen extends StatelessWidget {
         _buildFeatureTile(
           context,
           icon: Icons.notifications,
-          title: 'Notifications',
-          subtitle: 'View notification logs',
+          title: 'Crashes',
+          subtitle: 'View Crash logs',
           color: Colors.orange,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NotificationsScreen(config: config),
+                builder: (context) => CrashesScreen(config: config),
               ),
             );
           },
@@ -188,8 +189,8 @@ class MoreScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Implement clear all
+            onPressed: () async {
+              await DebugStorage().clearAll();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

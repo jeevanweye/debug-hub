@@ -231,212 +231,219 @@ class _CrashesScreenState extends State<CrashesScreen> {
     final crashes = _filteredCrashes;
     final errorType = _getFilterLabel(_selectedFilter);
 
-    return Column(
-      children: [
-        // Filter chips
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          color: Colors.grey[100],
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Crashes'),
+        backgroundColor: widget.config.mainColor,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          // Filter chips
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            color: Colors.grey[100],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  FilterChip(
+                    label: const Text('All'),
+                    selected: _selectedFilter == CrashFilterType.all,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = CrashFilterType.all;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  FilterChip(
+                    label: const Text('Fatal'),
+                    selected: _selectedFilter == CrashFilterType.fatal,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = CrashFilterType.fatal;
+                      });
+                    },
+                    selectedColor: Colors.red.withAlpha(25),
+                    checkmarkColor: Colors.red,
+                  ),
+                  const SizedBox(width: 8),
+                  FilterChip(
+                    label: const Text('Non-Fatal'),
+                    selected: _selectedFilter == CrashFilterType.nonFatal,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = CrashFilterType.nonFatal;
+                      });
+                    },
+                    selectedColor: Colors.orange.withAlpha(25),
+                    checkmarkColor: Colors.orange,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Crash count and actions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[200],
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                FilterChip(
-                  label: const Text('All'),
-                  selected: _selectedFilter == CrashFilterType.all,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedFilter = CrashFilterType.all;
-                    });
-                  },
+                Text(
+                  '${crashes.length} ${errorType.toLowerCase()}${crashes.length != 1 ? 's' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Fatal'),
-                  selected: _selectedFilter == CrashFilterType.fatal,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedFilter = CrashFilterType.fatal;
-                    });
-                  },
-                  selectedColor: Colors.red.withAlpha(25),
-                  checkmarkColor: Colors.red,
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Non-Fatal'),
-                  selected: _selectedFilter == CrashFilterType.nonFatal,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedFilter = CrashFilterType.nonFatal;
-                    });
-                  },
-                  selectedColor: Colors.orange.withAlpha(25),
-                  checkmarkColor: Colors.orange,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareAll,
+                      tooltip: 'Share all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: _clearAll,
+                      tooltip: 'Clear all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => setState(() {}),
+                      tooltip: 'Refresh',
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
-        // Crash count and actions
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.grey[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${crashes.length} ${errorType.toLowerCase()}${crashes.length != 1 ? 's' : ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _shareAll,
-                    tooltip: 'Share all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: _clearAll,
-                    tooltip: 'Clear all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => setState(() {}),
-                    tooltip: 'Refresh',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
 
-        // Crash list
-        Expanded(
-          child:               crashes.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.check_circle_outline,
-                        size: 64,
-                        color: Colors.green[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No ${errorType.toLowerCase()}s',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
+          // Crash list
+          Expanded(
+            child:               crashes.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 64,
+                          color: Colors.green[400],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _selectedFilter == CrashFilterType.fatal
-                            ? 'No fatal crashes recorded!'
-                            : _selectedFilter == CrashFilterType.nonFatal
-                                ? 'No non-fatal errors recorded!'
-                                : 'Your app is running smoothly!',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: crashes.length,
-                  itemBuilder: (context, index) {
-                    final crash = crashes[index];
-                    return InkWell(
-                      onTap: () => _showCrashDetail(crash),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No ${errorType.toLowerCase()}s',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              crash.isFatal ? Icons.error : Icons.warning_amber,
-                              color: crash.isFatal ? Colors.red : Colors.orange,
-                              size: 24,
+                        const SizedBox(height: 8),
+                        Text(
+                          _selectedFilter == CrashFilterType.fatal
+                              ? 'No fatal crashes recorded!'
+                              : _selectedFilter == CrashFilterType.nonFatal
+                                  ? 'No non-fatal errors recorded!'
+                                  : 'Your app is running smoothly!',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: crashes.length,
+                    itemBuilder: (context, index) {
+                      final crash = crashes[index];
+                      return InkWell(
+                        onTap: () => _showCrashDetail(crash),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[300]!),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: crash.isFatal ? Colors.red : Colors.orange,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            crash.isFatal ? 'FATAL' : 'NON-FATAL',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                crash.isFatal ? Icons.error : Icons.warning_amber,
+                                color: crash.isFatal ? Colors.red : Colors.orange,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: crash.isFatal ? Colors.red : Colors.orange,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              crash.isFatal ? 'FATAL' : 'NON-FATAL',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
+                                        const Spacer(),
+                                        Text(
+                                          '${crash.timestamp.hour.toString().padLeft(2, '0')}:'
+                                          '${crash.timestamp.minute.toString().padLeft(2, '0')}:'
+                                          '${crash.timestamp.second.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[600],
+                                          ),
                                         ),
-                                      const Spacer(),
-                                      Text(
-                                        '${crash.timestamp.hour.toString().padLeft(2, '0')}:'
-                                        '${crash.timestamp.minute.toString().padLeft(2, '0')}:'
-                                        '${crash.timestamp.second.toString().padLeft(2, '0')}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      crash.error.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    crash.error.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    crash.stackTrace.toString().split('\n').first,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                      fontFamily: 'monospace',
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      crash.stackTrace.toString().split('\n').first,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontFamily: 'monospace',
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
