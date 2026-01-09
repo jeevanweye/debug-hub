@@ -16,3 +16,5 @@ export 'package:log/log.dart';
 export 'package:events/events.dart' hide EventValidationDashboardScreen, EventValidationResultsScreen;
 export 'package:notification/notification.dart';
 export 'package:non_fatal/non_fatal.dart';
+export 'package:memory_monitor/memory_monitor.dart';
+

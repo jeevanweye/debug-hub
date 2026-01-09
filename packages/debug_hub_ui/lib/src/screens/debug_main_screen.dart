@@ -5,7 +5,7 @@ import 'logs_screen.dart';
 import 'crashes_screen.dart';
 import 'events_screen.dart';
 import 'notifications_screen.dart';
-import 'app_info_screen.dart';
+import 'more_screen.dart';
 
 class DebugMainScreen extends StatefulWidget {
   final DebugHubConfig config;
@@ -28,7 +28,7 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
     CrashesScreen(config: widget.config),
     EventsScreen(config: widget.config),
     NotificationsScreen(config: widget.config),
-    AppInfoScreen(config: widget.config),
+    MoreScreen(config: widget.config),
     if (widget.config.additionalTab != null)
       widget.config.additionalTab!,
   ];
@@ -55,8 +55,8 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
       label: 'Notifications',
     ),
     const BottomNavigationBarItem(
-      icon: Icon(Icons.info),
-      label: 'App Info',
+      icon: Icon(Icons.more_horiz),
+      label: 'More',
     ),
     if (widget.config.additionalTab != null)
       BottomNavigationBarItem(

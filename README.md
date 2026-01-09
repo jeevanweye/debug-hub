@@ -22,6 +22,8 @@ A comprehensive Flutter debugging tool built with **Clean Architecture** and **S
 - 🎨 **Customizable UI** - Theme colors and configuration options
 - 🔍 **Search & Filter** - Find what you need quickly
 - 📤 **Share Data** - Export debug data easily
+- 🧠 **Memory Monitoring** - Real-time memory usage tracking
+- 🗂️ **More Section** - Organized access to advanced features
 
 ## 🚀 Quick Start
 
@@ -60,7 +62,11 @@ The UI includes:
 - **Non-Fatal Tab** - Track crashes with stack traces
 - **Events Tab** - Monitor analytics events with properties
 - **Notifications Tab** - See all notifications received and tapped
-- **App Info Tab** - Device and app information
+- **More Tab** - Access advanced features:
+  - **App Info** - Device and app information
+  - **Memory Monitor** - Real-time memory usage tracking
+  - **Storage Manager** - Manage debug data storage
+  - **Settings** - Configure DebugHub preferences
 
 ## 🎯 Usage Examples
 
@@ -169,10 +175,11 @@ debug_hub/
 │   ├── events/         # Event tracking
 │   ├── notification/   # Notification logging
 │   ├── non_fatal/      # Crash reporting
+│   ├── memory_monitor/ # Memory usage monitoring
 │   └── debug_hub_ui/   # UI components
 ├── lib/
-│   ├── debug_hub.dart         # Main export
-│   └── debug_hub_simple.dart  # Simplified API
+│   ├── debug_hub.dart           # Main export
+│   └── debug_hub_interface.dart # Simplified API
 └── example/            # Example app
 ```
 
@@ -224,8 +231,10 @@ For issues or questions:
 | Crash Reporting | ✅ | ✅ |
 | Event Tracking | ✅ | ❌ |
 | Notification Logging | ✅ | ❌ |
+| Memory Monitoring | ✅ | ❌ |
 | Persistent Storage | ✅ | ❌ |
 | Bottom Navigation | ✅ | ❌ |
+| More Section | ✅ | ❌ |
 | Minimal Code | ✅ (3 lines) | ❌ |
 | Auto-disable in Release | ✅ | ✅ |
 | Clean Architecture | ✅ | ❌ |
@@ -243,6 +252,8 @@ For issues or questions:
 - [ ] Performance monitoring
 - [ ] Custom plugins API
 - [ ] Export to file formats (CSV, JSON)
+- [x] Memory usage monitoring
+- [x] More section for organized features
 
 ### Architecture Improvements
 - [ ] Add explicit Use Cases layer

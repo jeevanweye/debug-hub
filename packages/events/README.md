@@ -39,6 +39,8 @@ final events = EventTracker().getEvents();
 
 See [GOOGLE_SHEETS_INTEGRATION.md](GOOGLE_SHEETS_INTEGRATION.md) for detailed documentation.
 
+**⚠️ Getting Sign-In Error Code 10?** See [GOOGLE_SIGN_IN_SETUP.md](GOOGLE_SIGN_IN_SETUP.md) for setup instructions.
+
 ```dart
 import 'package:events/events.dart';
 

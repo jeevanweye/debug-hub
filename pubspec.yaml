@@ -29,14 +29,14 @@ dependencies:
     path: packages/network
   log:
     path: packages/log
-  storage:
-    path: packages/storage
   non_fatal:
     path: packages/non_fatal
   events:
     path: packages/events
   notification:
     path: packages/notification
+  memory_monitor:
+    path: packages/memory_monitor
   
   # For example/demo purposes
   http: ^1.2.0

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/master_sheet_info.dart';
 import '../models/sheet_version_info.dart';
 import '../repository/event_validation_repository.dart';
@@ -67,6 +68,30 @@ class _EventValidationDashboardScreenState
           _errorMessage = 'Failed to sign in. Please try again.';
         });
       }
+    } on PlatformException catch (e) {
+      String errorMsg = 'Sign-in failed';
+      
+      // Handle specific error codes
+      if (e.code == 'sign_in_failed') {
+        if (e.message?.contains('10') == true) {
+          errorMsg = 'Configuration Error (Code 10):\n\n'
+              'Google Sign-In is not properly configured.\n\n'
+              'Please check:\n'
+              '• SHA-1 fingerprint added to Firebase Console\n'
+              '• OAuth client ID configured correctly\n'
+              '• Package name matches Firebase project\n'
+              '• google-services.json file is present\n\n'
+              'See GOOGLE_SIGN_IN_SETUP.md for detailed instructions.';
+        } else {
+          errorMsg = 'Sign-in failed: ${e.message ?? "Unknown error"}';
+        }
+      } else {
+        errorMsg = 'Error: ${e.message ?? e.toString()}';
+      }
+      
+      setState(() {
+        _errorMessage = errorMsg;
+      });
     } catch (e) {
       setState(() {
         _errorMessage = 'Error: $e';

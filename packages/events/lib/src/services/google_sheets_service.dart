@@ -2,6 +2,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import '../models/master_sheet_info.dart';
 import '../models/sheet_version_info.dart';
 import '../models/event_report_info.dart';
@@ -41,9 +42,22 @@ class GoogleSheetsService {
         await _initializeSheetsApi(account);
       }
       return account;
+    } on PlatformException catch (e) {
+      debugPrint('Error signing in: $e');
+      // Error code 10 = DEVELOPER_ERROR (configuration issue)
+      if (e.code == 'sign_in_failed' && e.message?.contains('10') == true) {
+        debugPrint('⚠️ DEVELOPER_ERROR: Google Sign-In configuration issue');
+        debugPrint('💡 Common causes:');
+        debugPrint('   1. SHA-1 fingerprint not added to Firebase/Google Cloud Console');
+        debugPrint('   2. OAuth client ID not configured correctly');
+        debugPrint('   3. Package name mismatch');
+        debugPrint('   4. Missing google-services.json file');
+        debugPrint('💡 See GOOGLE_SIGN_IN_SETUP.md for setup instructions');
+      }
+      rethrow;
     } catch (error) {
       debugPrint('Error signing in: $error');
-      return null;
+      rethrow;
     }
   }
 

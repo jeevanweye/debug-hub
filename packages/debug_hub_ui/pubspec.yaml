@@ -15,14 +15,14 @@ dependencies:
     path: ../network
   log:
     path: ../log
-  storage:
-    path: ../storage
   non_fatal:
     path: ../non_fatal
   events:
     path: ../events
   notification:
     path: ../notification
+  memory_monitor:
+    path: ../memory_monitor
   
   # Additional dependencies
   device_info_plus: ^10.1.2
