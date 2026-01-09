@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../debug_hub_config.dart';
 import 'app_info_screen.dart';
-import 'memory_monitor_screen.dart';
+import 'notifications_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   final DebugHubConfig config;
@@ -19,6 +19,22 @@ class MoreScreen extends StatelessWidget {
         _buildSectionHeader('Debug Tools'),
         _buildFeatureTile(
           context,
+          icon: Icons.notifications,
+          title: 'Notifications',
+          subtitle: 'View notification logs',
+          color: Colors.orange,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NotificationsScreen(config: config),
+              ),
+            );
+          },
+        ),
+
+        _buildFeatureTile(
+          context,
           icon: Icons.info_outline,
           title: 'App Info',
           subtitle: 'Device and app information',
@@ -32,38 +48,9 @@ class MoreScreen extends StatelessWidget {
             );
           },
         ),
-        _buildFeatureTile(
-          context,
-          icon: Icons.memory,
-          title: 'Memory Monitor',
-          subtitle: 'Real-time memory usage tracking',
-          color: Colors.purple,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MemoryMonitorScreen(config: config),
-              ),
-            );
-          },
-        ),
-        
+
         const Divider(height: 32),
-        
-        _buildSectionHeader('Storage'),
-        _buildFeatureTile(
-          context,
-          icon: Icons.storage,
-          title: 'Storage Manager',
-          subtitle: 'Manage debug data storage',
-          color: Colors.orange,
-          onTap: () {
-            _showStorageDialog(context);
-          },
-        ),
-        
-        const Divider(height: 32),
-        
+
         _buildSectionHeader('Advanced'),
         _buildFeatureTile(
           context,
@@ -75,18 +62,8 @@ class MoreScreen extends StatelessWidget {
             _showClearAllDialog(context);
           },
         ),
-        _buildFeatureTile(
-          context,
-          icon: Icons.settings,
-          title: 'Settings',
-          subtitle: 'Configure DebugHub',
-          color: Colors.grey,
-          onTap: () {
-            _showSettingsDialog(context);
-          },
-        ),
-        
-        const SizedBox(height: 16),
+        const SizedBox(height: 50),
+        const Divider(height: 50),
         _buildVersionInfo(),
       ],
     );
@@ -164,15 +141,6 @@ class MoreScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Made with ❤️ for Flutter developers',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[500],
-              fontStyle: FontStyle.italic,
             ),
           ),
         ],

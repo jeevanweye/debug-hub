@@ -21,7 +21,7 @@ class DebugLogger {
 
   void log(
     String message, {
-    LogLevel level = LogLevel.debug,
+    AppLogLevel level = AppLogLevel.debug,
     String? tag,
     dynamic error,
     StackTrace? stackTrace,
@@ -47,19 +47,19 @@ class DebugLogger {
   }
 
   void verbose(String message, {String? tag, Map<String, dynamic>? metadata}) {
-    log(message, level: LogLevel.verbose, tag: tag, metadata: metadata);
+    log(message, level: AppLogLevel.verbose, tag: tag, metadata: metadata);
   }
 
   void debug(String message, {String? tag, Map<String, dynamic>? metadata}) {
-    log(message, level: LogLevel.debug, tag: tag, metadata: metadata);
+    log(message, level: AppLogLevel.debug, tag: tag, metadata: metadata);
   }
 
   void info(String message, {String? tag, Map<String, dynamic>? metadata}) {
-    log(message, level: LogLevel.info, tag: tag, metadata: metadata);
+    log(message, level: AppLogLevel.info, tag: tag, metadata: metadata);
   }
 
   void warning(String message, {String? tag, Map<String, dynamic>? metadata}) {
-    log(message, level: LogLevel.warning, tag: tag, metadata: metadata);
+    log(message, level: AppLogLevel.warning, tag: tag, metadata: metadata);
   }
 
   void error(
@@ -71,7 +71,7 @@ class DebugLogger {
   }) {
     log(
       message,
-      level: LogLevel.error,
+      level: AppLogLevel.error,
       tag: tag,
       error: error,
       stackTrace: stackTrace,
@@ -88,7 +88,7 @@ class DebugLogger {
   }) {
     log(
       message,
-      level: LogLevel.wtf,
+      level: AppLogLevel.wtf,
       tag: tag,
       error: error,
       stackTrace: stackTrace,

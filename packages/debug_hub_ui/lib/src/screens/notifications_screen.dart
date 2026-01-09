@@ -254,247 +254,254 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final logs = _filteredLogs;
 
-    return Column(
-      children: [
-        // Search bar
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          color: Colors.grey[100],
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search notifications...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value;
-              });
-            },
-          ),
-        ),
-
-        // Type filter chips
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          color: Colors.grey[100],
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                FilterChip(
-                  label: const Text('All'),
-                  selected: _selectedType == null,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedType = null;
-                    });
-                  },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        backgroundColor: widget.config.mainColor,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          // Search bar
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            color: Colors.grey[100],
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search notifications...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(width: 8),
-                ...NotificationType.values.map((type) {
-                  final isSelected = _selectedType == type;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(_getTypeLabel(type)),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedType = selected ? type : null;
-                        });
-                      },
-                      selectedColor: _getTypeColor(type).withAlpha(25),
-                      checkmarkColor: _getTypeColor(type),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+
+          // Type filter chips
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            color: Colors.grey[100],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  FilterChip(
+                    label: const Text('All'),
+                    selected: _selectedType == null,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedType = null;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ...NotificationType.values.map((type) {
+                    final isSelected = _selectedType == type;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(_getTypeLabel(type)),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedType = selected ? type : null;
+                          });
+                        },
+                        selectedColor: _getTypeColor(type).withAlpha(25),
+                        checkmarkColor: _getTypeColor(type),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+
+          // Log count and actions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${logs.length} notification${logs.length != 1 ? 's' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareAll,
+                      tooltip: 'Share all',
                     ),
-                  );
-                }),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: _clearAll,
+                      tooltip: 'Clear all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => setState(() {}),
+                      tooltip: 'Refresh',
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-        ),
 
-        // Log count and actions
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.grey[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${logs.length} notification${logs.length != 1 ? 's' : ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _shareAll,
-                    tooltip: 'Share all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: _clearAll,
-                    tooltip: 'Clear all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => setState(() {}),
-                    tooltip: 'Refresh',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Log list
-        Expanded(
-          child: logs.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_none,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No notification logs',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
+          // Log list
+          Expanded(
+            child: logs.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_none,
+                          size: 64,
+                          color: Colors.grey[400],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Notification logs will appear here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: logs.length,
-                  itemBuilder: (context, index) {
-                    final log = logs[index];
-                    return InkWell(
-                      onTap: () => _showLogDetail(log),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No notification logs',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              _getTypeIcon(log.type),
-                              color: _getTypeColor(log.type),
-                              size: 24,
+                        const SizedBox(height: 8),
+                        Text(
+                          'Notification logs will appear here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: logs.length,
+                    itemBuilder: (context, index) {
+                      final log = logs[index];
+                      return InkWell(
+                        onTap: () => _showLogDetail(log),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[300]!),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _getTypeColor(log.type),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          _getTypeLabel(log.type).toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                _getTypeIcon(log.type),
+                                color: _getTypeColor(log.type),
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getTypeColor(log.type),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            _getTypeLabel(log.type).toUpperCase(),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const Spacer(),
+                                        const Spacer(),
+                                        Text(
+                                          '${log.timestamp.hour.toString().padLeft(2, '0')}:'
+                                          '${log.timestamp.minute.toString().padLeft(2, '0')}:'
+                                          '${log.timestamp.second.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    if (log.title != null) ...[
                                       Text(
-                                        '${log.timestamp.hour.toString().padLeft(2, '0')}:'
-                                        '${log.timestamp.minute.toString().padLeft(2, '0')}:'
-                                        '${log.timestamp.second.toString().padLeft(2, '0')}',
+                                        log.title!,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                    ],
+                                    if (log.body != null)
+                                      Text(
+                                        log.body!,
+                                        style: const TextStyle(fontSize: 13),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    if (log.notificationId != null) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'ID: ${log.notificationId}',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                    if (log.payload != null && log.payload!.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.grey[600],
                                         ),
                                       ),
                                     ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  if (log.title != null) ...[
-                                    Text(
-                                      log.title!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 2),
                                   ],
-                                  if (log.body != null)
-                                    Text(
-                                      log.body!,
-                                      style: const TextStyle(fontSize: 13),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  if (log.notificationId != null) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'ID: ${log.notificationId}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[600],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                  if (log.payload != null && log.payload!.isNotEmpty) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

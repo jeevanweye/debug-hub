@@ -1,18 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:base/base.dart';
 import '../debug_hub_config.dart';
 import '../screens/debug_main_screen.dart';
+import '../navigation/debug_hub_navigator_observer.dart';
 
 class DebugBubble extends StatefulWidget {
   final DebugHubConfig config;
-  final GlobalKey<NavigatorState> navigatorKey;
 
   const DebugBubble({
     super.key,
     required this.config,
-    required this.navigatorKey,
   });
 
   @override
@@ -23,17 +20,11 @@ class _DebugBubbleState extends State<DebugBubble> {
   Offset? _position;
   bool _isVisible = true;
   bool _isDragging = false;
-  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  DateTime? _lastShakeTime;
-  static const double _shakeThreshold = 25.0;
+  final DebugHubNavigatorObserver _observer = DebugHubNavigatorObserver();
 
   @override
   void initState() {
     super.initState();
-    // Shake gesture is disabled by default to keep bubble always visible
-    // if (widget.config.enableShakeGesture) {
-    //   _setupShakeDetection();
-    // }
   }
 
   Offset _getPosition(BuildContext context) {
@@ -49,81 +40,60 @@ class _DebugBubbleState extends State<DebugBubble> {
     );
   }
 
-  void _setupShakeDetection() {
-    _accelerometerSubscription = accelerometerEventStream().listen((event) {
-      final now = DateTime.now();
-      if (_lastShakeTime != null &&
-          now.difference(_lastShakeTime!) < const Duration(milliseconds: 500)) {
-        return;
-      }
-
-      final acceleration = event.x.abs() + event.y.abs() + event.z.abs();
-      if (acceleration > _shakeThreshold) {
-        _lastShakeTime = now;
-        _toggleVisibility();
-      }
-    });
-  }
-
-  void _toggleVisibility() {
-    setState(() {
-      _isVisible = !_isVisible;
-    });
-  }
-
   void _openDebugScreen() {
-    final navigator = widget.navigatorKey.currentState;
-    if (navigator != null) {
-      navigator.push(
+    // Use NavigatorState from NavigatorObserver (similar to WEChucker)
+    final navigatorState = _observer.navigatorState;
+    
+    if (navigatorState != null) {
+      navigatorState.push(
         MaterialPageRoute(
           builder: (context) => DebugMainScreen(config: widget.config),
         ),
       );
+    } else {
+      debugPrint('⚠️ DebugHub: NavigatorState not available. Make sure DebugHubNavigatorObserver is added to navigatorObservers.');
     }
   }
 
   void _onLongPress() {
-    final navigator = widget.navigatorKey.currentState;
-    final context = navigator?.context;
-    
-    if (navigator != null && context != null) {
-      showDialog(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('DebugHub'),
-          content: const Text('Do you want to clear all debug data?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Clear all data
-                DebugStorage().clearAll();
-                Navigator.of(dialogContext).pop();
-                
-                // Show snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('All debug data cleared')),
-                );
-              },
-              child: const Text('Clear'),
-            ),
-          ],
-        ),
-      );
-    }
+    // Use widget's build context for dialog
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('DebugHub'),
+        content: const Text('Do you want to clear all debug data?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Clear all data
+              DebugStorage().clearAll();
+              Navigator.of(dialogContext).pop();
+              
+              // Show snackbar
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('All debug data cleared')),
+              );
+            },
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _accelerometerSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // navigatorContext should be provided from MaterialAppExtension's builder
+    // which is inside the Navigator tree
     if (!_isVisible) return const SizedBox.shrink();
 
     final position = _getPosition(context);
@@ -157,8 +127,8 @@ class _DebugBubbleState extends State<DebugBubble> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: 60,
-            height: 60,
+            width: 45,
+            height: 45,
             decoration: BoxDecoration(
               color: _isDragging 
                   ? widget.config.mainColor.withOpacity(0.8)
@@ -175,7 +145,7 @@ class _DebugBubbleState extends State<DebugBubble> {
             child: const Icon(
               Icons.bug_report,
               color: Colors.white,
-              size: 30,
+              size: 20,
             ),
           ),
         ),

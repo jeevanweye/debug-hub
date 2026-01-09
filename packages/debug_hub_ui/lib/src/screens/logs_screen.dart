@@ -19,7 +19,7 @@ class LogsScreen extends StatefulWidget {
 class _LogsScreenState extends State<LogsScreen> {
   final DebugStorage _storage = DebugStorage();
   String _searchQuery = '';
-  final Set<LogLevel> _selectedLevels = LogLevel.values.toSet();
+  final Set<AppLogLevel> _selectedLevels = AppLogLevel.values.toSet();
 
   List<DebugLog> get _filteredLogs {
     var logs = _storage.getLogs().reversed.toList();
@@ -38,36 +38,36 @@ class _LogsScreenState extends State<LogsScreen> {
     return logs;
   }
 
-  Color _getLevelColor(LogLevel level) {
+  Color _getLevelColor(AppLogLevel level) {
     switch (level) {
-      case LogLevel.verbose:
+      case AppLogLevel.verbose:
         return Colors.grey;
-      case LogLevel.debug:
+      case AppLogLevel.debug:
         return Colors.blue;
-      case LogLevel.info:
+      case AppLogLevel.info:
         return Colors.green;
-      case LogLevel.warning:
+      case AppLogLevel.warning:
         return Colors.orange;
-      case LogLevel.error:
+      case AppLogLevel.error:
         return Colors.red;
-      case LogLevel.wtf:
+      case AppLogLevel.wtf:
         return Colors.purple;
     }
   }
 
-  IconData _getLevelIcon(LogLevel level) {
+  IconData _getLevelIcon(AppLogLevel level) {
     switch (level) {
-      case LogLevel.verbose:
+      case AppLogLevel.verbose:
         return Icons.text_snippet;
-      case LogLevel.debug:
+      case AppLogLevel.debug:
         return Icons.bug_report;
-      case LogLevel.info:
+      case AppLogLevel.info:
         return Icons.info;
-      case LogLevel.warning:
+      case AppLogLevel.warning:
         return Icons.warning;
-      case LogLevel.error:
+      case AppLogLevel.error:
         return Icons.error;
-      case LogLevel.wtf:
+      case AppLogLevel.wtf:
         return Icons.dangerous;
     }
   }
@@ -317,7 +317,7 @@ class _LogsScreenState extends State<LogsScreen> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: LogLevel.values.map((level) {
+              children: AppLogLevel.values.map((level) {
                 final isSelected = _selectedLevels.contains(level);
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),

@@ -35,8 +35,6 @@ dependencies:
     path: packages/events
   notification:
     path: packages/notification
-  memory_monitor:
-    path: packages/memory_monitor
   
   # For example/demo purposes
   http: 1.3.0

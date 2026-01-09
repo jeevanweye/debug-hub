@@ -34,9 +34,6 @@ class DebugHubConfig {
   /// Main theme color for debug UI
   final Color mainColor;
 
-  /// Enable shake gesture to show/hide debug bubble (disabled by default to keep bubble always visible)
-  final bool enableShakeGesture;
-
   /// Enable log monitoring
   final bool enableLogMonitoring;
 
@@ -82,7 +79,6 @@ class DebugHubConfig {
     this.emailToRecipients,
     this.emailCcRecipients,
     this.mainColor = const Color(0xFF42d459),
-    this.enableShakeGesture = false,
     this.enableLogMonitoring = true,
     this.enableNetworkMonitoring = true,
     this.enableCrashMonitoring = true,
@@ -133,7 +129,6 @@ class DebugHubConfig {
       emailToRecipients: emailToRecipients ?? this.emailToRecipients,
       emailCcRecipients: emailCcRecipients ?? this.emailCcRecipients,
       mainColor: mainColor ?? this.mainColor,
-      enableShakeGesture: enableShakeGesture ?? this.enableShakeGesture,
       enableLogMonitoring: enableLogMonitoring ?? this.enableLogMonitoring,
       enableNetworkMonitoring: enableNetworkMonitoring ?? this.enableNetworkMonitoring,
       enableCrashMonitoring: enableCrashMonitoring ?? this.enableCrashMonitoring,

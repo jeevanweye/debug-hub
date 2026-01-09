@@ -1,4 +1,4 @@
-enum LogLevel {
+enum AppLogLevel {
   verbose,
   debug,
   info,
@@ -10,7 +10,7 @@ enum LogLevel {
 class DebugLog {
   final String id;
   final DateTime timestamp;
-  final LogLevel level;
+  final AppLogLevel level;
   final String message;
   final String? tag;
   final dynamic error;
@@ -29,7 +29,7 @@ class DebugLog {
   });
 
   factory DebugLog.create({
-    required LogLevel level,
+    required AppLogLevel level,
     required String message,
     String? tag,
     dynamic error,
@@ -65,9 +65,9 @@ class DebugLog {
     return DebugLog(
       id: json['id'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      level: LogLevel.values.firstWhere(
+      level: AppLogLevel.values.firstWhere(
         (e) => e.name == json['level'],
-        orElse: () => LogLevel.debug,
+        orElse: () => AppLogLevel.debug,
       ),
       message: json['message'] as String,
       tag: json['tag'] as String?,

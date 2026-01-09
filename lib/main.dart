@@ -1,32 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:debug_hub_ui/debug_hub_ui.dart';
 import 'package:base/base.dart';
 import 'package:network/network.dart';
 import 'package:events/events.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:debug_hub/debug_hub.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize DebugHub with configuration (only in debug mode)
-  await DebugHub().init(
-    config: const DebugHubConfig(
-      serverURL: 'https://jsonplaceholder.typicode.com',
-      mainColor: Color(0xFF42d459),
-      enableShakeGesture: false, // Keep bubble always visible
-      enableLogMonitoring: true,
-      enableNetworkMonitoring: true,
-      enableCrashMonitoring: true,
-      enableEventMonitoring: true, // Enable event monitoring
-      showBubbleOnStart: true,
-      emailToRecipients: ['developer@example.com'],
-    ),
-  );
-
-  // Enable DebugHub (only works in debug mode)
-  DebugHub().enable();
-
   runApp(const MyApp());
 }
 
@@ -36,18 +17,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       title: 'Debug Hub',
+      navigatorObservers: [DebugHubManager.getObserver()],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      navigatorKey: DebugHub().navigatorKey,
       home: const MyHomePage(),
       // Add DebugHub overlay using builder
       builder: (context, child) {
-        return DebugHub().wrap(child ?? const SizedBox.shrink());
+         return DebugHubManager.initialize(
+          child: child!,
+        );
       },
     );
   }
@@ -74,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Log the action
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.info,
+        level: AppLogLevel.info,
         message: 'Counter incremented to $_counter',
         tag: 'Counter',
       ),
@@ -121,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // Log success
       _storage.addLog(
         DebugLog.create(
-          level: LogLevel.info,
+          level: AppLogLevel.info,
           message: 'Network request successful: ${response.statusCode}',
           tag: 'Network',
         ),
@@ -139,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // Log error
       _storage.addLog(
         DebugLog.create(
-          level: LogLevel.error,
+          level: AppLogLevel.error,
           message: 'Network request failed',
           tag: 'Network',
           error: e,
@@ -193,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       _storage.addLog(
         DebugLog.create(
-          level: LogLevel.info,
+          level: AppLogLevel.info,
           message: 'POST request successful: ${response.statusCode}',
           tag: 'Network',
         ),
@@ -210,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e, stackTrace) {
       _storage.addLog(
         DebugLog.create(
-          level: LogLevel.error,
+          level: AppLogLevel.error,
           message: 'POST request failed',
           tag: 'Network',
           error: e,
@@ -233,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Generate different log levels
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.verbose,
+        level: AppLogLevel.verbose,
         message: 'This is a verbose log message',
         tag: 'Test',
       ),
@@ -241,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.debug,
+        level: AppLogLevel.debug,
         message: 'This is a debug log message',
         tag: 'Test',
       ),
@@ -249,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.info,
+        level: AppLogLevel.info,
         message: 'This is an info log message',
         tag: 'Test',
       ),
@@ -257,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.warning,
+        level: AppLogLevel.warning,
         message: 'This is a warning log message',
         tag: 'Test',
       ),
@@ -265,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.error,
+        level: AppLogLevel.error,
         message: 'This is an error log message',
         tag: 'Test',
         error: 'Sample error',
@@ -274,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _storage.addLog(
       DebugLog.create(
-        level: LogLevel.wtf,
+        level: AppLogLevel.wtf,
         message: 'This is a WTF log message',
         tag: 'Test',
       ),
@@ -304,7 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       _storage.addLog(
         DebugLog.create(
-          level: LogLevel.error,
+          level: AppLogLevel.error,
           message: 'Crash simulated',
           tag: 'Crash',
           error: e,

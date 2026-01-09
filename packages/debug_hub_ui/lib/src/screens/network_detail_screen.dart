@@ -304,7 +304,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen> with SingleTi
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        if (widget.request.headers != null) ...[
+        if (widget.request.headers != null && widget.request.headers!.isNotEmpty) ...[
           _buildInfoCard(
             title: 'Request Headers',
             items: widget.request.headers!.entries
@@ -313,7 +313,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen> with SingleTi
           ),
           const SizedBox(height: 16),
         ],
-        if (widget.request.responseHeaders != null)
+        if (widget.request.responseHeaders != null && widget.request.responseHeaders!.isNotEmpty)
           _buildInfoCard(
             title: 'Response Headers',
             items: widget.request.responseHeaders!.entries
@@ -342,41 +342,52 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen> with SingleTi
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            if (title.isNotEmpty) ...[
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            ...items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 120,
-                    child: Text(
-                      item.label,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[700],
+              const SizedBox(height: 12),
+            ],
+            if (items.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'No items',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              )
+            else
+              ...items.map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        item.label,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700] ?? Colors.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: SelectableText(
-                      item.value,
-                      style: TextStyle(
-                        color: item.isError ? Colors.red : Colors.black87,
-                        fontFamily: item.value.length > 50 ? 'monospace' : null,
+                    Expanded(
+                      child: SelectableText(
+                        item.value,
+                        style: TextStyle(
+                          color: item.isError ? Colors.red : Colors.black87,
+                          fontFamily: item.value.length > 50 ? 'monospace' : null,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            )),
+                  ],
+                ),
+              )),
           ],
         ),
       ),

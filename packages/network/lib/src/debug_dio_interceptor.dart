@@ -10,27 +10,24 @@ class DebugDioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    super.onRequest(options, handler);
     final requestId = _interceptor.captureRequest(
       url: options.uri.toString(),
       method: options.method,
       headers: options.headers.map((key, value) => MapEntry(key, value.toString())),
       body: options.data,
     );
-
     _requestIds[options] = requestId;
     _requestTimes[options] = DateTime.now();
-
-    handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    super.onResponse(response, handler);
     final requestId = _requestIds[response.requestOptions];
     final requestTime = _requestTimes[response.requestOptions];
-
     if (requestId != null && requestTime != null) {
       final duration = DateTime.now().difference(requestTime);
-
       _interceptor.captureResponse(
         id: requestId,
         statusCode: response.statusCode,
@@ -44,18 +41,15 @@ class DebugDioInterceptor extends Interceptor {
       _requestIds.remove(response.requestOptions);
       _requestTimes.remove(response.requestOptions);
     }
-
-    handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    super.onError(err, handler);
     final requestId = _requestIds[err.requestOptions];
     final requestTime = _requestTimes[err.requestOptions];
-
     if (requestId != null && requestTime != null) {
       final duration = DateTime.now().difference(requestTime);
-
       _interceptor.captureResponse(
         id: requestId,
         statusCode: err.response?.statusCode,
@@ -70,8 +64,6 @@ class DebugDioInterceptor extends Interceptor {
       _requestIds.remove(err.requestOptions);
       _requestTimes.remove(err.requestOptions);
     }
-
-    handler.next(err);
   }
 }
 

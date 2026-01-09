@@ -4,14 +4,18 @@ import 'package:base/base.dart';
 import 'package:share_plus/share_plus.dart';
 import '../debug_hub_config.dart';
 
+enum CrashFilterType {
+  all,
+  fatal,
+  nonFatal,
+}
+
 class CrashesScreen extends StatefulWidget {
   final DebugHubConfig config;
-  final bool showOnlyNonFatal;
 
   const CrashesScreen({
     super.key,
     required this.config,
-    this.showOnlyNonFatal = true,
   });
 
   @override
@@ -20,26 +24,28 @@ class CrashesScreen extends StatefulWidget {
 
 class _CrashesScreenState extends State<CrashesScreen> {
   final DebugStorage _storage = DebugStorage();
+  CrashFilterType _selectedFilter = CrashFilterType.all;
 
   List<CrashReport> get _filteredCrashes {
     final allCrashes = _storage.getCrashReports().reversed.toList();
-    if (widget.showOnlyNonFatal) {
-      return allCrashes.where((crash) => !crash.isFatal).toList();
+    
+    switch (_selectedFilter) {
+      case CrashFilterType.all:
+        return allCrashes;
+      case CrashFilterType.fatal:
+        return allCrashes.where((crash) => crash.isFatal).toList();
+      case CrashFilterType.nonFatal:
+        return allCrashes.where((crash) => !crash.isFatal).toList();
     }
-    return allCrashes;
   }
 
   void _clearAll() {
-    final title = widget.showOnlyNonFatal ? 'Clear Non-Fatal Errors' : 'Clear Crashes';
-    final content = widget.showOnlyNonFatal 
-        ? 'Are you sure you want to clear all non-fatal error reports?'
-        : 'Are you sure you want to clear all crash reports?';
-    
+    final filterLabel = _getFilterLabel(_selectedFilter);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
+        title: Text('Clear $filterLabel'),
+        content: Text('Are you sure you want to clear all $filterLabel?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -58,9 +64,20 @@ class _CrashesScreenState extends State<CrashesScreen> {
     );
   }
 
+  String _getFilterLabel(CrashFilterType filter) {
+    switch (filter) {
+      case CrashFilterType.all:
+        return 'Crashes';
+      case CrashFilterType.fatal:
+        return 'Fatal Crashes';
+      case CrashFilterType.nonFatal:
+        return 'Non-Fatal Crashes';
+    }
+  }
+
   void _shareAll() {
     final crashes = _filteredCrashes;
-    final errorType = widget.showOnlyNonFatal ? 'Non-Fatal Errors' : 'Crashes';
+    final errorType = _getFilterLabel(_selectedFilter);
     
     if (crashes.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -212,10 +229,55 @@ class _CrashesScreenState extends State<CrashesScreen> {
   @override
   Widget build(BuildContext context) {
     final crashes = _filteredCrashes;
-    final errorType = widget.showOnlyNonFatal ? 'Non-Fatal Error' : 'Crash';
+    final errorType = _getFilterLabel(_selectedFilter);
 
     return Column(
       children: [
+        // Filter chips
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          color: Colors.grey[100],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                FilterChip(
+                  label: const Text('All'),
+                  selected: _selectedFilter == CrashFilterType.all,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedFilter = CrashFilterType.all;
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Fatal'),
+                  selected: _selectedFilter == CrashFilterType.fatal,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedFilter = CrashFilterType.fatal;
+                    });
+                  },
+                  selectedColor: Colors.red.withAlpha(25),
+                  checkmarkColor: Colors.red,
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Non-Fatal'),
+                  selected: _selectedFilter == CrashFilterType.nonFatal,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedFilter = CrashFilterType.nonFatal;
+                    });
+                  },
+                  selectedColor: Colors.orange.withAlpha(25),
+                  checkmarkColor: Colors.orange,
+                ),
+              ],
+            ),
+          ),
+        ),
         // Crash count and actions
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -272,9 +334,11 @@ class _CrashesScreenState extends State<CrashesScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.showOnlyNonFatal 
-                            ? 'No non-fatal errors recorded!'
-                            : 'Your app is running smoothly!',
+                        _selectedFilter == CrashFilterType.fatal
+                            ? 'No fatal crashes recorded!'
+                            : _selectedFilter == CrashFilterType.nonFatal
+                                ? 'No non-fatal errors recorded!'
+                                : 'Your app is running smoothly!',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[500],
@@ -300,8 +364,8 @@ class _CrashesScreenState extends State<CrashesScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              widget.showOnlyNonFatal ? Icons.warning_amber : Icons.error,
-                              color: widget.showOnlyNonFatal ? Colors.orange : Colors.red,
+                              crash.isFatal ? Icons.error : Icons.warning_amber,
+                              color: crash.isFatal ? Colors.red : Colors.orange,
                               size: 24,
                             ),
                             const SizedBox(width: 12),

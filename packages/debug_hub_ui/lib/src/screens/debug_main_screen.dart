@@ -4,7 +4,6 @@ import 'network_screen.dart';
 import 'logs_screen.dart';
 import 'crashes_screen.dart';
 import 'events_screen.dart';
-import 'notifications_screen.dart';
 import 'more_screen.dart';
 
 class DebugMainScreen extends StatefulWidget {
@@ -27,7 +26,6 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
     LogsScreen(config: widget.config),
     CrashesScreen(config: widget.config),
     EventsScreen(config: widget.config),
-    NotificationsScreen(config: widget.config),
     MoreScreen(config: widget.config),
     if (widget.config.additionalTab != null)
       widget.config.additionalTab!,
@@ -44,15 +42,11 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.warning_amber),
-      label: 'Non-Fatal',
+      label: 'Crash',
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.analytics),
       label: 'Events',
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.notifications),
-      label: 'Notifications',
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.more_horiz),
@@ -67,30 +61,45 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('DebugHub'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: _navItems,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: widget.config.mainColor,
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 11,
-        showUnselectedLabels: true,
+    return SafeArea(
+      bottom: false,
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('DebugHub'),
+          backgroundColor: widget.config.mainColor,
+          foregroundColor: Colors.white,
+        ),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            items: _navItems,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: widget.config.mainColor,
+            unselectedItemColor: Colors.grey,
+            selectedFontSize: 12,
+            unselectedFontSize: 11,
+            showUnselectedLabels: true,
+          ),
+        ),
       ),
     );
   }

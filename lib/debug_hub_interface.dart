@@ -1,5 +1,5 @@
 /// DebugHub Manager - Enterprise-grade debugging solution
-/// 
+///
 /// This provides a clean, production-ready interface for developers.
 library debug_hub_manager;
 
@@ -7,17 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:debug_hub_ui/debug_hub_ui.dart' hide DebugHubConfig;
 import 'package:debug_hub_ui/src/debug_hub_config.dart' show DebugHubConfig;
 import 'package:debug_hub_ui/src/screens/debug_main_screen.dart';
-import 'package:base/base.dart' show LogLevel;
+import 'package:base/base.dart' show AppLogLevel;
 import 'package:log/log.dart';
 import 'package:events/events.dart';
 import 'package:notification/notification.dart';
 import 'package:non_fatal/non_fatal.dart';
 
 /// DebugHub Manager - Simplified API for enterprise integration
-/// 
+///
 /// Provides a clean interface for integrating DebugHub into your application
 /// with minimal code and maximum functionality.
-/// 
+///
 /// Example:
 /// ```dart
 /// void main() async {
@@ -33,17 +33,17 @@ class DebugHubManager {
   DebugHubManager._();
 
   /// Initialize DebugHub with optional configuration
-  /// 
+  ///
   /// This should be called early in your `main()` function before `runApp`.
-  /// 
+  ///
   /// Parameters:
   /// - [packageName]: Your app's package identifier (e.g., 'com.yourcompany.app')
   /// - [serverURL]: Your API server URL for highlighting in network requests
   /// - [ignoredURLs]: List of URL patterns to exclude from network monitoring
   /// - [mainColor]: Primary theme color for DebugHub UI
-  /// - [enableShakeGesture]: Enable shake to show/hide debug bubble (default: false)
+  /// - [enableShakeGesture]: Deprecated - shake gesture functionality has been removed (ignored)
   /// - [showBubbleOnStart]: Show debug bubble when app starts (default: true)
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await DebugHubManager.initialize(
@@ -52,46 +52,31 @@ class DebugHubManager {
   ///   mainColor: Colors.blue,
   /// );
   /// ```
-  static Future<void> initialize({
+  static Widget initialize({
     String? serverURL,
     List<String>? ignoredURLs,
     Color? mainColor,
-    bool enableShakeGesture = false,
     bool showBubbleOnStart = true,
     String? packageName,
-  }) async {
+    required Widget child,
+  }) {
     final config = DebugHubConfig(
       serverURL: serverURL,
       ignoredURLs: ignoredURLs,
       mainColor: mainColor ?? const Color(0xFF42d459),
-      enableShakeGesture: enableShakeGesture,
       showBubbleOnStart: showBubbleOnStart,
       packageName: packageName,
     );
-
-    await DebugHub().init(config: config);
-    DebugHub().enable();
-  }
-
-  /// Wrap your MaterialApp to enable DebugHub overlay
-  /// 
-  /// This adds the debug bubble and enables all DebugHub features.
-  /// 
-  /// Example:
-  /// ```dart
-  /// runApp(DebugHubManager.wrap(MyApp()));
-  /// ```
-  static Widget wrap(Widget app) {
-    return DebugHub().wrap(app);
+    return DebugHub().wrap(child, config: config);
   }
 
   /// Log a message with optional tag and level
-  /// 
+  ///
   /// Parameters:
   /// - [message]: The log message
   /// - [tag]: Optional tag for categorization (e.g., 'Auth', 'Network')
   /// - [level]: Log level (debug, info, warning, error)
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.log('User logged in', tag: 'Auth');
@@ -99,23 +84,19 @@ class DebugHubManager {
   static void log(
     String message, {
     String? tag,
-    LogLevel level = LogLevel.debug,
+    AppLogLevel level = AppLogLevel.debug,
   }) {
-    DebugLogger().log(
-      message,
-      tag: tag,
-      level: level,
-    );
+    DebugLogger().log(message, tag: tag, level: level);
   }
 
   /// Log an error with optional error object and stack trace
-  /// 
+  ///
   /// Parameters:
   /// - [message]: Error description
   /// - [error]: The error object
   /// - [stackTrace]: Stack trace for debugging
   /// - [tag]: Optional tag for categorization
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.logError('Failed to load data', error: e, stackTrace: s);
@@ -129,19 +110,19 @@ class DebugHubManager {
     DebugLogger().log(
       message,
       tag: tag,
-      level: LogLevel.error,
+      level: AppLogLevel.error,
       error: error,
       stackTrace: stackTrace,
     );
   }
 
   /// Track an analytics event
-  /// 
+  ///
   /// Parameters:
   /// - [name]: Event name (e.g., 'button_click', 'page_view')
   /// - [properties]: Event properties as key-value pairs
   /// - [source]: Event source (e.g., 'firebase', 'clevertap')
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.trackEvent(
@@ -155,23 +136,19 @@ class DebugHubManager {
     Map<String, dynamic>? properties,
     String? source,
   }) {
-    EventTracker().trackEvent(
-      name,
-      properties: properties,
-      source: source,
-    );
+    EventTracker().trackEvent(name, properties: properties, source: source);
   }
 
   /// Log a notification received
-  /// 
+  ///
   /// Call this when your app receives a push notification.
-  /// 
+  ///
   /// Parameters:
   /// - [title]: Notification title
   /// - [body]: Notification body text
   /// - [payload]: Additional data payload
   /// - [notificationId]: Unique notification identifier
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.logNotification(
@@ -196,15 +173,15 @@ class DebugHubManager {
   }
 
   /// Log a notification tap
-  /// 
+  ///
   /// Call this when user taps on a notification.
-  /// 
+  ///
   /// Parameters:
   /// - [notificationId]: Unique notification identifier (required)
   /// - [title]: Notification title
   /// - [body]: Notification body text
   /// - [payload]: Additional data payload
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.logNotificationTap(
@@ -228,13 +205,13 @@ class DebugHubManager {
   }
 
   /// Report a non-fatal crash or error
-  /// 
+  ///
   /// Use this to manually report errors that don't crash the app.
-  /// 
+  ///
   /// Parameters:
   /// - [error]: The error object
   /// - [stackTrace]: Stack trace for debugging
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// try {
@@ -243,14 +220,34 @@ class DebugHubManager {
   ///   DebugHubManager.reportCrash(error, stackTrace);
   /// }
   /// ```
-  static void reportCrash(dynamic error, StackTrace? stackTrace) {
-    CrashHandler().reportError(error, stackTrace: stackTrace);
+  static void reportCrash(
+    dynamic error,
+    StackTrace? stackTrace, {
+    bool isFatal = false,
+  }) {
+    CrashHandler().reportError(error, stackTrace: stackTrace, isFatal: isFatal);
+  }
+
+  /// Get the NavigatorObserver for DebugHub
+  ///
+  /// This should be added to MaterialApp's navigatorObservers list.
+  /// Similar to WEChucker.getObserver()
+  ///
+  /// Example:
+  /// ```dart
+  /// MaterialApp(
+  ///   navigatorObservers: [DebugHubManager.getObserver()],
+  ///   // ...
+  /// )
+  /// ```
+  static NavigatorObserver getObserver() {
+    return DebugHub().getObserver();
   }
 
   /// Clear all debug data
-  /// 
+  ///
   /// Clears all logs, network requests, crashes, events, and notifications.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await DebugHubManager.clearAll();
@@ -260,9 +257,9 @@ class DebugHubManager {
   }
 
   /// Show DebugHub screen manually
-  /// 
+  ///
   /// Opens the DebugHub dashboard programmatically.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// DebugHubManager.show(context);
@@ -271,11 +268,8 @@ class DebugHubManager {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DebugMainScreen(
-          config: DebugHub().config,
-        ),
+        builder: (context) => DebugMainScreen(config: DebugHub().config),
       ),
     );
   }
 }
-
