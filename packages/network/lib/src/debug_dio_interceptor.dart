@@ -28,6 +28,13 @@ class DebugDioInterceptor extends Interceptor {
     final requestTime = _requestTimes[response.requestOptions];
     if (requestId != null && requestTime != null) {
       final duration = DateTime.now().difference(requestTime);
+      final requestOptions = response.requestOptions;
+      _interceptor.updateRequest(
+        id: requestId,
+        method: requestOptions.method,
+        headers: requestOptions.headers.map((key, value) => MapEntry(key, value.toString())),
+        body: requestOptions.data,
+      );
       _interceptor.captureResponse(
         id: requestId,
         statusCode: response.statusCode,
@@ -50,6 +57,13 @@ class DebugDioInterceptor extends Interceptor {
     final requestTime = _requestTimes[err.requestOptions];
     if (requestId != null && requestTime != null) {
       final duration = DateTime.now().difference(requestTime);
+      final requestOptions = err.response?.requestOptions;
+      _interceptor.updateRequest(
+        id: requestId,
+        method: requestOptions?.method ?? '',
+        headers: requestOptions?.headers.map((key, value) => MapEntry(key, value.toString())),
+        body: requestOptions?.data,
+      );
       _interceptor.captureResponse(
         id: requestId,
         statusCode: err.response?.statusCode,

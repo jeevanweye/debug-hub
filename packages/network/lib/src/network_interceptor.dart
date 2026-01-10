@@ -42,6 +42,25 @@ class NetworkInterceptor {
     return id;
   }
 
+  void updateRequest({
+    required String id,
+    String? method,
+    Map<String, dynamic>? headers,
+    dynamic body,
+  }) {
+    if (!_isEnabled) return;
+    final existingRequest = _storage.getNetworkRequestById(id);
+    if (existingRequest != null) {
+      final updatedRequest = existingRequest.copyWith(
+        id: id,
+        headers: headers,
+        requestBody: body,
+        requestSize: _calculateSize(body),
+      );
+      _storage.updateNetworkRequest(id, updatedRequest);
+    }
+  }
+
   void captureResponse({
     required String id,
     int? statusCode,
