@@ -42,25 +42,6 @@ class NetworkInterceptor {
     return id;
   }
 
-  void updateRequest({
-    required String id,
-    String? method,
-    Map<String, dynamic>? headers,
-    dynamic body,
-  }) {
-    if (!_isEnabled) return;
-    final existingRequest = _storage.getNetworkRequestById(id);
-    if (existingRequest != null) {
-      final updatedRequest = existingRequest.copyWith(
-        id: id,
-        headers: headers,
-        requestBody: body,
-        requestSize: _calculateSize(body),
-      );
-      _storage.updateNetworkRequest(id, updatedRequest);
-    }
-  }
-
   void captureResponse({
     required String id,
     int? statusCode,
@@ -83,6 +64,37 @@ class NetworkInterceptor {
       );
       _storage.updateNetworkRequest(id, updatedRequest);
     }
+  }
+
+  void captureNetworkData({
+    required String id,
+    required String url,
+    required String method,
+    Map<String, dynamic>? requestHeaders,
+    dynamic requestBody,
+    int? statusCode,
+    dynamic responseBody,
+    Map<String, dynamic>? responseHeaders,
+    Duration? duration,
+    String? error,
+  }) {
+    if (!_isEnabled) return;
+    final request = NetworkRequest(
+      id: id,
+      timestamp: DateTime.now(),
+      url: url,
+      method: _parseMethod(method),
+      headers: requestHeaders,
+      requestBody: requestBody,
+      requestSize: _calculateSize(requestBody),
+      statusCode: statusCode,
+      responseBody: responseBody,
+      responseHeaders: responseHeaders,
+      duration: duration,
+      error: error,
+      responseSize: _calculateSize(responseBody),
+    );
+    _storage.addNetworkRequest(request);
   }
 
   RequestMethod _parseMethod(String method) {

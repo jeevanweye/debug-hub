@@ -62,30 +62,32 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      top: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('DebugHub'),
-          backgroundColor: widget.config.mainColor,
-          foregroundColor: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('DebugHub'),
+        backgroundColor: widget.config.mainColor,
+        foregroundColor: Colors.white,
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, -10),
+            ),
+          ],
         ),
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
+        child: MediaQuery.removePadding(
+          context: context,
+          removeBottom: true,
           child: BottomNavigationBar(
+            backgroundColor: Colors.white,
             currentIndex: _currentIndex,
             onTap: (index) {
               setState(() {

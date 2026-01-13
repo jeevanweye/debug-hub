@@ -107,7 +107,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Request Details'),
+        title: const Text('API Details'),
         backgroundColor: widget.config.mainColor,
         foregroundColor: Colors.white,
         actions: [
@@ -165,6 +165,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
+          labelStyle: const TextStyle(fontSize: 14),
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'Request'),
@@ -196,7 +197,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
             NetworkInfoItem('Method', widget.request.method.name.toUpperCase()),
             NetworkInfoItem(
                 'Status', widget.request.statusCode?.toString() ?? 'Pending'),
-            NetworkInfoItem('Time', widget.request.timestamp.toString()),
+            NetworkInfoItem('Time', DateFormatter.formatDate(widget.request.timestamp) + DateFormatter.formatTime12Hour(widget.request.timestamp)),
             if (widget.request.duration != null)
               NetworkInfoItem(
                   'Duration', '${widget.request.duration!.inMilliseconds}ms'),
@@ -234,7 +235,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
               _requestViewMode = mode;
             });
           },
-          label: 'Request Body',
+          label: 'Body',
           onCopy: widget.request.requestBody != null
               ? () => _copyToClipboard(
                     widget.request.getFormattedRequestBody(),
@@ -269,7 +270,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
               _responseViewMode = mode;
             });
           },
-          label: 'Response Body',
+          label:  'Body',
           onCopy: widget.request.responseBody != null
               ? () => _copyToClipboard(
                     widget.request.getFormattedResponseBody(),

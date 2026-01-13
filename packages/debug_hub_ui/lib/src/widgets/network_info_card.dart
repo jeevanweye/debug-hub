@@ -25,9 +25,9 @@ class NetworkInfoCard extends StatelessWidget {
 
   void _copyToClipboard(BuildContext context, String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$label copied to clipboard')));
   }
 
   @override
@@ -52,10 +52,7 @@ class NetworkInfoCard extends StatelessWidget {
             if (items.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'No items',
-                  style: TextStyle(color: Colors.grey),
-                ),
+                child: Text('No items', style: TextStyle(color: Colors.grey)),
               )
             else
               ...items.map(
@@ -76,24 +73,37 @@ class NetworkInfoCard extends StatelessWidget {
                       ),
                       Expanded(
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: SelectableText(
-                                item.value,
-                                style: TextStyle(
-                                  color: item.isError ? Colors.red : Colors.black87,
-                                  fontFamily: item.value.length > 50 ? 'monospace' : null,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SelectableText(
+                                    item.value,
+                                    style: TextStyle(
+                                      color: item.isError
+                                          ? Colors.red
+                                          : Colors.black87,
+                                      fontFamily: item.value.length > 50
+                                          ? 'monospace'
+                                          : null,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             if (showCopyButtons)
-                              IconButton(
-                                icon: const Icon(Icons.copy, size: 16),
-                                onPressed: () =>
-                                    _copyToClipboard(context, item.value, item.label),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                tooltip: 'Copy',
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8, top: 2),
+                                child: GestureDetector(
+                                  onTap: () => _copyToClipboard(
+                                    context,
+                                    item.value,
+                                    item.label,
+                                  ),
+                                  child: const Icon(Icons.copy, size: 16),
+                                ),
                               ),
                           ],
                         ),
@@ -108,4 +118,3 @@ class NetworkInfoCard extends StatelessWidget {
     );
   }
 }
-
