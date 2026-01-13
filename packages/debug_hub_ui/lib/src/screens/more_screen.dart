@@ -3,6 +3,7 @@ import '../debug_hub_config.dart';
 import 'app_info_screen.dart';
 import 'crashes_screen.dart';
 import 'package:base/base.dart';
+import 'device_details_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   final DebugHubConfig config;
@@ -29,6 +30,31 @@ class MoreScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => CrashesScreen(config: config),
+              ),
+            );
+          },
+        ),
+
+        _buildFeatureTile(
+          context,
+          icon: Icons.network_check,
+          title: 'Device Details',
+          subtitle: 'View device ID and FCM token',
+          color: Colors.purple,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DeviceDetailsScreen(
+                  dataItems: {
+                    'Device Name': 'Pixel 7',
+                    'Device ID': '1234567890',
+                    'Platform': 'Android',
+                    'App Version': '1.0.0',
+                    'FCM Token': 'fcm_token_goes_here',
+                    'Access Token': 'access_token_goes_here',
+                  },
+                ),
               ),
             );
           },
@@ -231,4 +257,3 @@ class MoreScreen extends StatelessWidget {
     );
   }
 }
-
