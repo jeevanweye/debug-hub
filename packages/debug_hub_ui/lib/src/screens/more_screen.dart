@@ -3,6 +3,7 @@ import '../debug_hub_config.dart';
 import 'app_info_screen.dart';
 import 'crashes_screen.dart';
 import 'package:base/base.dart';
+import 'device_details_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   final DebugHubConfig config;
@@ -36,21 +37,46 @@ class MoreScreen extends StatelessWidget {
             },
           ),
 
-          _buildFeatureTile(
-            context,
-            icon: Icons.info_outline,
-            title: 'App Info',
-            subtitle: 'Device and app information',
-            color: Colors.blue,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AppInfoScreen(config: config),
+        _buildFeatureTile(
+          context,
+          icon: Icons.devices,
+          title: 'Device Details',
+          subtitle: 'View device ID and FCM token',
+          color: Colors.purple,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DeviceDetailsScreen(
+                  dataItems: {
+                    'Device Name': 'Pixel 7',
+                    'Device ID': '1234567890',
+                    'Platform': 'Android',
+                    'App Version': '1.0.0',
+                    'FCM Token': 'fcm_token_goes_here',
+                    'Access Token': 'access_token_goes_here',
+                  },
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+        ),
+
+        _buildFeatureTile(
+          context,
+          icon: Icons.info_outline,
+          title: 'App Info',
+          subtitle: 'Device and app information',
+          color: Colors.blue,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AppInfoScreen(config: config),
+              ),
+            );
+          },
+        ),
 
           const Divider(height: 32),
 
@@ -234,4 +260,3 @@ class MoreScreen extends StatelessWidget {
     );
   }
 }
-
