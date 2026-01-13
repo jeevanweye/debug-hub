@@ -205,94 +205,97 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('App Info'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-      ),
-      body: Container(
-        color: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _copyAllInfo,
-                  icon: const Icon(Icons.copy),
-                  label: const Text('Copy All'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: widget.config.mainColor,
-                    foregroundColor: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('App Info'),
+          backgroundColor: widget.config.mainColor,
+          foregroundColor: Colors.white,
+        ),
+        body: Container(
+          color: Colors.white,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // Actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _copyAllInfo,
+                    icon: const Icon(Icons.copy),
+                    label: const Text('Copy All'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.config.mainColor,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Storage Info Card (at top)
+              _buildStorageCard(),
+              const SizedBox(height: 16),
+
+              // App Info
+              if (_packageInfo != null) ...[
+                _buildInfoCard(
+                  title: 'Application',
+                  icon: Icons.apps,
+                  items: [
+                    _InfoItem('App Name', _packageInfo!.appName),
+                    _InfoItem('Package Name', _packageInfo!.packageName),
+                    _InfoItem('Version', _packageInfo!.version),
+                    _InfoItem('Build Number', _packageInfo!.buildNumber),
+                  ],
                 ),
+                const SizedBox(height: 16),
               ],
-            ),
-            const SizedBox(height: 8),
 
-            // Storage Info Card (at top)
-            _buildStorageCard(),
-            const SizedBox(height: 16),
+              // Device Info
+              if (_deviceInfo != null) ...[
+                _buildInfoCard(
+                  title: 'Device',
+                  icon: Icons.phone_android,
+                  items: _deviceInfo!.entries
+                      .map((e) => _InfoItem(e.key, e.value.toString()))
+                      .toList(),
+                ),
+                const SizedBox(height: 16),
+              ],
 
-            // App Info
-            if (_packageInfo != null) ...[
+              // Flutter Info
               _buildInfoCard(
-                title: 'Application',
-                icon: Icons.apps,
+                title: 'Flutter',
+                icon: Icons.flutter_dash,
                 items: [
-                  _InfoItem('App Name', _packageInfo!.appName),
-                  _InfoItem('Package Name', _packageInfo!.packageName),
-                  _InfoItem('Version', _packageInfo!.version),
-                  _InfoItem('Build Number', _packageInfo!.buildNumber),
+                  _InfoItem('Dart Version', Platform.version.split(' ')[0]),
+                  _InfoItem('Platform', Platform.operatingSystem),
+                  _InfoItem('OS Version', Platform.operatingSystemVersion),
+                  _InfoItem(
+                    'Number of Processors',
+                    Platform.numberOfProcessors.toString(),
+                  ),
+                  _InfoItem('Path Separator', Platform.pathSeparator),
+                  _InfoItem('Locale', Platform.localeName),
                 ],
               ),
               const SizedBox(height: 16),
-            ],
 
-            // Device Info
-            if (_deviceInfo != null) ...[
+              // Environment Info
               _buildInfoCard(
-                title: 'Device',
-                icon: Icons.phone_android,
-                items: _deviceInfo!.entries
-                    .map((e) => _InfoItem(e.key, e.value.toString()))
-                    .toList(),
+                title: 'Environment',
+                icon: Icons.settings,
+                items: [
+                  _InfoItem('Script', Platform.script.toString()),
+                  _InfoItem('Executable', Platform.executable),
+                  _InfoItem('Resolved Executable', Platform.resolvedExecutable),
+                ],
               ),
-              const SizedBox(height: 16),
             ],
-
-            // Flutter Info
-            _buildInfoCard(
-              title: 'Flutter',
-              icon: Icons.flutter_dash,
-              items: [
-                _InfoItem('Dart Version', Platform.version.split(' ')[0]),
-                _InfoItem('Platform', Platform.operatingSystem),
-                _InfoItem('OS Version', Platform.operatingSystemVersion),
-                _InfoItem(
-                  'Number of Processors',
-                  Platform.numberOfProcessors.toString(),
-                ),
-                _InfoItem('Path Separator', Platform.pathSeparator),
-                _InfoItem('Locale', Platform.localeName),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Environment Info
-            _buildInfoCard(
-              title: 'Environment',
-              icon: Icons.settings,
-              items: [
-                _InfoItem('Script', Platform.script.toString()),
-                _InfoItem('Executable', Platform.executable),
-                _InfoItem('Resolved Executable', Platform.resolvedExecutable),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

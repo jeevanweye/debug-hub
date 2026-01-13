@@ -285,236 +285,239 @@ class _LogsScreenState extends State<LogsScreen> {
   Widget build(BuildContext context) {
     final logs = _filteredLogs;
 
-    return Column(
-      children: [
-        // Search bar
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          color: Colors.grey[100],
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search logs...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Search bar
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            color: Colors.grey[100],
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search logs...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
               ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
             ),
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value;
-              });
-            },
           ),
-        ),
 
-        // Level filter chips
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          color: Colors.grey[100],
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+          // Level filter chips
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            color: Colors.grey[100],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: AppLogLevel.values.map((level) {
+                  final isSelected = _selectedLevels.contains(level);
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(level.name.toUpperCase()),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedLevels.add(level);
+                          } else {
+                            _selectedLevels.remove(level);
+                          }
+                        });
+                      },
+                      selectedColor: _getLevelColor(level).withOpacity(0.3),
+                      checkmarkColor: _getLevelColor(level),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+
+          // Log count and actions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[200],
             child: Row(
-              children: AppLogLevel.values.map((level) {
-                final isSelected = _selectedLevels.contains(level);
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(level.name.toUpperCase()),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedLevels.add(level);
-                        } else {
-                          _selectedLevels.remove(level);
-                        }
-                      });
-                    },
-                    selectedColor: _getLevelColor(level).withOpacity(0.3),
-                    checkmarkColor: _getLevelColor(level),
-                  ),
-                );
-              }).toList(),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${logs.length} log${logs.length != 1 ? 's' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareAll,
+                      tooltip: 'Share all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: _clearAll,
+                      tooltip: 'Clear all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => setState(() {}),
+                      tooltip: 'Refresh',
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
 
-        // Log count and actions
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.grey[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${logs.length} log${logs.length != 1 ? 's' : ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _shareAll,
-                    tooltip: 'Share all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: _clearAll,
-                    tooltip: 'Clear all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => setState(() {}),
-                    tooltip: 'Refresh',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Log list
-        Expanded(
-          child: logs.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.article,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No logs',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
+          // Log list
+          Expanded(
+            child: logs.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.article,
+                          size: 64,
+                          color: Colors.grey[400],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Logs will appear here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: logs.length,
-                  itemBuilder: (context, index) {
-                    final log = logs[index];
-                    return InkWell(
-                      onTap: () => _showLogDetail(log),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No logs',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              _getLevelIcon(log.level),
-                              color: _getLevelColor(log.level),
-                              size: 20,
+                        const SizedBox(height: 8),
+                        Text(
+                          'Logs will appear here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: logs.length,
+                    itemBuilder: (context, index) {
+                      final log = logs[index];
+                      return InkWell(
+                        onTap: () => _showLogDetail(log),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[300]!),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _getLevelColor(log.level),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          log.level.name.toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      if (log.tag != null) ...[
-                                        const SizedBox(width: 8),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                _getLevelIcon(log.level),
+                                color: _getLevelColor(log.level),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 6,
                                             vertical: 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.grey[300],
+                                            color: _getLevelColor(log.level),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(
-                                            log.tag!,
+                                            log.level.name.toUpperCase(),
                                             style: const TextStyle(
+                                              color: Colors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),
-                                      ],
-                                      const Spacer(),
-                                      Text(
-                                        '${log.timestamp.hour.toString().padLeft(2, '0')}:'
-                                        '${log.timestamp.minute.toString().padLeft(2, '0')}:'
-                                        '${log.timestamp.second.toString().padLeft(2, '0')}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
+                                        if (log.tag != null) ...[
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              log.tag!,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        const Spacer(),
+                                        Text(
+                                          '${log.timestamp.hour.toString().padLeft(2, '0')}:'
+                                          '${log.timestamp.minute.toString().padLeft(2, '0')}:'
+                                          '${log.timestamp.second.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[600],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    log.message,
-                                    style: const TextStyle(fontSize: 14),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  if (log.error != null) ...[
+                                      ],
+                                    ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Error: ${log.error}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.red[600],
-                                      ),
-                                      maxLines: 1,
+                                      log.message,
+                                      style: const TextStyle(fontSize: 14),
+                                      maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
                                     ),
+                                    if (log.error != null) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Error: ${log.error}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.red[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

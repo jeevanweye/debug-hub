@@ -62,45 +62,49 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('DebugHub'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              spreadRadius: 0,
-              offset: const Offset(0, -10),
-            ),
-          ],
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('DebugHub'),
+          backgroundColor: widget.config.mainColor,
+          foregroundColor: Colors.white,
         ),
-        child: MediaQuery.removePadding(
-          context: context,
-          removeBottom: true,
-          child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            items: _navItems,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: widget.config.mainColor,
-            unselectedItemColor: Colors.grey,
-            selectedFontSize: 12,
-            unselectedFontSize: 11,
-            showUnselectedLabels: true,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                spreadRadius: 0,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeBottom: true,
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              items: _navItems,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: widget.config.mainColor,
+              unselectedItemColor: Colors.grey,
+              selectedFontSize: 12,
+              unselectedFontSize: 11,
+              showUnselectedLabels: true,
+            ),
           ),
         ),
       ),

@@ -30,11 +30,6 @@ class DebugHub {
   /// Initialize DebugHub with configuration synchronously
   /// Returns false if not in debug mode
   bool _init({DebugHubConfig? config}) {
-    // Only allow in debug mode
-    if (!kDebugMode) {
-      debugPrint('⚠️ DebugHub can only be used in debug mode');
-      return false;
-    }
 
     if (config != null) {
       _config = config;
@@ -52,10 +47,6 @@ class DebugHub {
   /// Enable DebugHub
   /// Returns false if not in debug mode
   bool enable() {
-    // Enforce debug mode only
-    if (!kDebugMode) {
-      return false;
-    }
 
     if (_isEnabled) return true;
     
@@ -117,7 +108,7 @@ class DebugHub {
     }
     
     // Don't show in release mode or if bubble is disabled
-    if (!kDebugMode || !_isEnabled || !_config.showBubbleOnStart) {
+    if (!_isEnabled || !_config.showBubbleOnStart) {
       return child;
     }
 

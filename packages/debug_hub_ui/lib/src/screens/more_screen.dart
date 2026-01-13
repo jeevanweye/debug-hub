@@ -14,59 +14,62 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      children: [
-        _buildSectionHeader('Debug Tools'),
-        _buildFeatureTile(
-          context,
-          icon: Icons.notifications,
-          title: 'Crashes',
-          subtitle: 'View Crash logs',
-          color: Colors.orange,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CrashesScreen(config: config),
-              ),
-            );
-          },
-        ),
+    return Container(
+      color: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        children: [
+          _buildSectionHeader('Debug Tools'),
+          _buildFeatureTile(
+            context,
+            icon: Icons.notifications,
+            title: 'Crashes',
+            subtitle: 'View Crash logs',
+            color: Colors.orange,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CrashesScreen(config: config),
+                ),
+              );
+            },
+          ),
 
-        _buildFeatureTile(
-          context,
-          icon: Icons.info_outline,
-          title: 'App Info',
-          subtitle: 'Device and app information',
-          color: Colors.blue,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AppInfoScreen(config: config),
-              ),
-            );
-          },
-        ),
+          _buildFeatureTile(
+            context,
+            icon: Icons.info_outline,
+            title: 'App Info',
+            subtitle: 'Device and app information',
+            color: Colors.blue,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AppInfoScreen(config: config),
+                ),
+              );
+            },
+          ),
 
-        const Divider(height: 32),
+          const Divider(height: 32),
 
-        _buildSectionHeader('Advanced'),
-        _buildFeatureTile(
-          context,
-          icon: Icons.delete_sweep,
-          title: 'Clear All Data',
-          subtitle: 'Remove all debug data',
-          color: Colors.red,
-          onTap: () {
-            _showClearAllDialog(context);
-          },
-        ),
-        const SizedBox(height: 50),
-        const Divider(height: 50),
-        _buildVersionInfo(),
-      ],
+          _buildSectionHeader('Advanced'),
+          _buildFeatureTile(
+            context,
+            icon: Icons.delete_sweep,
+            title: 'Clear All Data',
+            subtitle: 'Remove all debug data',
+            color: Colors.red,
+            onTap: () {
+              _showClearAllDialog(context);
+            },
+          ),
+          const SizedBox(height: 50),
+          const Divider(height: 50),
+          _buildVersionInfo(),
+        ],
+      ),
     );
   }
 

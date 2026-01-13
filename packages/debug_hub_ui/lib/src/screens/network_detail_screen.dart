@@ -105,83 +105,86 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('API Details'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.share),
-            onSelected: (value) {
-              switch (value) {
-                case 'share':
-                  _shareRequest();
-                  break;
-                case 'share_curl':
-                  _shareAsCurl();
-                  break;
-                case 'copy_curl':
-                  _copyAsCurl();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'share',
-                child: Row(
-                  children: [
-                    Icon(Icons.share),
-                    SizedBox(width: 8),
-                    Text('Share Details'),
-                  ],
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('API Details'),
+          backgroundColor: widget.config.mainColor,
+          foregroundColor: Colors.white,
+          actions: [
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.share),
+              onSelected: (value) {
+                switch (value) {
+                  case 'share':
+                    _shareRequest();
+                    break;
+                  case 'share_curl':
+                    _shareAsCurl();
+                    break;
+                  case 'copy_curl':
+                    _copyAsCurl();
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'share',
+                  child: Row(
+                    children: [
+                      Icon(Icons.share),
+                      SizedBox(width: 8),
+                      Text('Share Details'),
+                    ],
+                  ),
                 ),
-              ),
-              const PopupMenuItem(
-                value: 'share_curl',
-                child: Row(
-                  children: [
-                    Icon(Icons.terminal),
-                    SizedBox(width: 8),
-                    Text('Share as cURL'),
-                  ],
+                const PopupMenuItem(
+                  value: 'share_curl',
+                  child: Row(
+                    children: [
+                      Icon(Icons.terminal),
+                      SizedBox(width: 8),
+                      Text('Share as cURL'),
+                    ],
+                  ),
                 ),
-              ),
-              const PopupMenuItem(
-                value: 'copy_curl',
-                child: Row(
-                  children: [
-                    Icon(Icons.copy),
-                    SizedBox(width: 8),
-                    Text('Copy as cURL'),
-                  ],
+                const PopupMenuItem(
+                  value: 'copy_curl',
+                  child: Row(
+                    children: [
+                      Icon(Icons.copy),
+                      SizedBox(width: 8),
+                      Text('Copy as cURL'),
+                    ],
+                  ),
                 ),
-              ),
+              ],
+            ),
+          ],
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            labelStyle: const TextStyle(fontSize: 14),
+            tabs: const [
+              Tab(text: 'Overview'),
+              Tab(text: 'Request'),
+              Tab(text: 'Response'),
+              Tab(text: 'Headers'),
             ],
           ),
-        ],
-        bottom: TabBar(
+        ),
+        body: TabBarView(
           controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          labelStyle: const TextStyle(fontSize: 14),
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Request'),
-            Tab(text: 'Response'),
-            Tab(text: 'Headers'),
+          children: [
+            _buildOverviewTab(),
+            _buildRequestTab(),
+            _buildResponseTab(),
+            _buildHeadersTab(),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOverviewTab(),
-          _buildRequestTab(),
-          _buildResponseTab(),
-          _buildHeadersTab(),
-        ],
       ),
     );
   }

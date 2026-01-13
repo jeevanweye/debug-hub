@@ -110,144 +110,147 @@ class _NetworkScreenState extends State<NetworkScreen> {
   Widget build(BuildContext context) {
     final requests = _filteredRequests;
 
-    return Column(
-      children: [
-        // Search and filter bar
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          color: Colors.grey[100],
-          child: Column(
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search URL or method...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: SegmentedButton<String>(
-                      segments: const [
-                        ButtonSegment(value: 'all', label: Text('All')),
-                        ButtonSegment(value: 'success', label: Text('Success')),
-                        ButtonSegment(value: 'error', label: Text('Error')),
-                        ButtonSegment(value: 'pending', label: Text('Pending')),
-                      ],
-                      selected: {_filterType},
-                      onSelectionChanged: (Set<String> newSelection) {
-                        setState(() {
-                          _filterType = newSelection.first;
-                        });
-                      },
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Search and filter bar
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            color: Colors.grey[100],
+            child: Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search URL or method...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Request count and actions
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.grey[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${requests.length} request${requests.length != 1 ? 's' : ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _shareAll,
-                    tooltip: 'Share all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: _clearAll,
-                    tooltip: 'Clear all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => setState(() {}),
-                    tooltip: 'Refresh',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Request list
-        Expanded(
-          child: requests.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.network_check,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No network requests',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Network requests will appear here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: requests.length,
-                  itemBuilder: (context, index) {
-                    final request = requests[index];
-                    return NetworkRequestTile(
-                      request: request,
-                      config: widget.config,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NetworkDetailScreen(
-                              request: request,
-                              config: widget.config,
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
                   },
                 ),
-        ),
-      ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(value: 'all', label: Text('All')),
+                          ButtonSegment(value: 'success', label: Text('Success')),
+                          ButtonSegment(value: 'error', label: Text('Error')),
+                          ButtonSegment(value: 'pending', label: Text('Pending')),
+                        ],
+                        selected: {_filterType},
+                        onSelectionChanged: (Set<String> newSelection) {
+                          setState(() {
+                            _filterType = newSelection.first;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Request count and actions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${requests.length} request${requests.length != 1 ? 's' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareAll,
+                      tooltip: 'Share all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: _clearAll,
+                      tooltip: 'Clear all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => setState(() {}),
+                      tooltip: 'Refresh',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Request list
+          Expanded(
+            child: requests.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.network_check,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No network requests',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Network requests will appear here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: requests.length,
+                    itemBuilder: (context, index) {
+                      final request = requests[index];
+                      return NetworkRequestTile(
+                        request: request,
+                        config: widget.config,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NetworkDetailScreen(
+                                request: request,
+                                config: widget.config,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

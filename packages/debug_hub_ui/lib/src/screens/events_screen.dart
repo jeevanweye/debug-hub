@@ -252,232 +252,235 @@ class _EventsScreenState extends State<EventsScreen> {
     final events = _filteredEvents;
     final sources = _availableSources;
 
-    return Column(
-      children: [
-        // Search bar
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          color: Colors.grey[100],
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search events...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value;
-              });
-            },
-          ),
-        ),
-
-        // Source filter chips
-        if (sources.isNotEmpty)
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Search bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.all(8.0),
             color: Colors.grey[100],
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  FilterChip(
-                    label: const Text('All'),
-                    selected: _selectedSource == null,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedSource = null;
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ...sources.map((source) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(source),
-                      selected: _selectedSource == source,
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search events...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+
+          // Source filter chips
+          if (sources.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              color: Colors.grey[100],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    FilterChip(
+                      label: const Text('All'),
+                      selected: _selectedSource == null,
                       onSelected: (selected) {
                         setState(() {
-                          _selectedSource = selected ? source : null;
+                          _selectedSource = null;
                         });
                       },
-                      selectedColor: _getSourceColor(source).withOpacity(0.3),
-                      checkmarkColor: _getSourceColor(source),
                     ),
-                  )),
-                ],
+                    const SizedBox(width: 8),
+                    ...sources.map((source) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(source),
+                        selected: _selectedSource == source,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedSource = selected ? source : null;
+                          });
+                        },
+                        selectedColor: _getSourceColor(source).withOpacity(0.3),
+                        checkmarkColor: _getSourceColor(source),
+                      ),
+                    )),
+                  ],
+                ),
               ),
+            ),
+
+          // Event count and actions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${events.length} event${events.length != 1 ? 's' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.table_chart),
+                      onPressed: _openEventValidation,
+                      tooltip: 'Validate with Google Sheets',
+                      color: Colors.green[700],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareAll,
+                      tooltip: 'Share all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: _clearAll,
+                      tooltip: 'Clear all',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => setState(() {}),
+                      tooltip: 'Refresh',
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
 
-        // Event count and actions
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.grey[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${events.length} event${events.length != 1 ? 's' : ''}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.table_chart),
-                    onPressed: _openEventValidation,
-                    tooltip: 'Validate with Google Sheets',
-                    color: Colors.green[700],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _shareAll,
-                    tooltip: 'Share all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: _clearAll,
-                    tooltip: 'Clear all',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => setState(() {}),
-                    tooltip: 'Refresh',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Event list
-        Expanded(
-          child: events.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.analytics_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No events',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
+          // Event list
+          Expanded(
+            child: events.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.analytics_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Analytics events will appear here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    final event = events[index];
-                    return InkWell(
-                      onTap: () => _showEventDetail(event),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No events',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.analytics,
-                              color: _getSourceColor(event.source),
-                              size: 20,
+                        const SizedBox(height: 8),
+                        Text(
+                          'Analytics events will appear here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      final event = events[index];
+                      return InkWell(
+                        onTap: () => _showEventDetail(event),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[300]!),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      if (event.source != null) ...[
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getSourceColor(event.source),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            event.source!,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.analytics,
+                                color: _getSourceColor(event.source),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        if (event.source != null) ...[
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _getSourceColor(event.source),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              event.source!,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                      ],
-                                      Expanded(
-                                        child: Text(
-                                          event.name,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
+                                          const SizedBox(width: 8),
+                                        ],
+                                        Expanded(
+                                          child: Text(
+                                            event.name,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
+                                        Text(
+                                          '${event.timestamp.hour.toString().padLeft(2, '0')}:'
+                                          '${event.timestamp.minute.toString().padLeft(2, '0')}:'
+                                          '${event.timestamp.second.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (event.properties != null && event.properties!.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
                                       Text(
-                                        '${event.timestamp.hour.toString().padLeft(2, '0')}:'
-                                        '${event.timestamp.minute.toString().padLeft(2, '0')}:'
-                                        '${event.timestamp.second.toString().padLeft(2, '0')}',
+                                        'Screen Name: ${event.screenName} :: ${event.properties!.length} propert${event.properties!.length != 1 ? 'ies' : 'y'}',
                                         style: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 12,
                                           color: Colors.grey[600],
                                         ),
                                       ),
                                     ],
-                                  ),
-                                  if (event.properties != null && event.properties!.isNotEmpty) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Screen Name: ${event.screenName} :: ${event.properties!.length} propert${event.properties!.length != 1 ? 'ies' : 'y'}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
                                   ],
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -41,9 +41,7 @@ class DebugLogger {
     _storage.addLog(debugLog);
 
     // Also print to console in debug mode
-    if (kDebugMode) {
-      debugPrint(debugLog.toString());
-    }
+    debugPrint(debugLog.toString());
   }
 
   void verbose(String message, {String? tag, Map<String, dynamic>? metadata}) {

@@ -120,11 +120,6 @@ Add initialization in the `init` method:
 import 'package:events/events.dart';
 
 Future<bool> init({DebugHubConfig? config}) async {
-  // Only allow in debug mode
-  if (!kDebugMode) {
-    debugPrint('⚠️ DebugHub can only be used in debug mode');
-    return false;
-  }
 
   _config = config ?? const DebugHubConfig();
   
