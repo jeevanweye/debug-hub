@@ -37,7 +37,7 @@ class MoreScreen extends StatelessWidget {
 
         _buildFeatureTile(
           context,
-          icon: Icons.network_check,
+          icon: Icons.devices,
           title: 'Device Details',
           subtitle: 'View device ID and FCM token',
           color: Colors.purple,
