@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:base/base.dart';
-import 'package:network/network.dart';
-import 'package:events/events.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:debug_hub/debug_hub.dart';
@@ -27,7 +24,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(),
       // Add DebugHub overlay using builder
       builder: (context, child) {
-         return DebugHubManager.initialize(
+        return DebugHubManager.initialize(
           child: child!,
         );
       },
@@ -488,13 +485,13 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(height: 8),
               const Text(
                 '• Network monitoring\n'
-                '• Log capture\n'
-                '• Non-fatal error tracking\n'
-                '• Analytics events tracking\n'
-                '• App & device info\n'
-                '• Always visible in debug mode\n'
-                '• Share debug data\n'
-                '• Share as cURL command',
+                    '• Log capture\n'
+                    '• Non-fatal error tracking\n'
+                    '• Analytics events tracking\n'
+                    '• App & device info\n'
+                    '• Always visible in debug mode\n'
+                    '• Share debug data\n'
+                    '• Share as cURL command',
                 textAlign: TextAlign.left,
               ),
             ],
