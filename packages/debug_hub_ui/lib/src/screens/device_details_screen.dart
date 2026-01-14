@@ -34,34 +34,37 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Details'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              final shareableString =
-              dataItems.entries.map((e) => '${e.key}: ${e.value}').join('\n');
-              SharePlus.instance.share(ShareParams(text: shareableString));
-            },
-          ),
-        ],
-      ),
-      body: dataItems.entries.isEmpty ?
-          Center(
-            child: Text('No data available'),
-          )
-          : ListView(
-              padding: const EdgeInsets.all(16),
-        children: [
-          NetworkInfoCard(
-            title: 'User data',
-            items: dataItems.entries
-                .map((entry) => NetworkInfoItem(entry.key, entry.value.toString()))
-                .toList(),
-          ),
-        ],
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Details'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                final shareableString =
+                dataItems.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+                SharePlus.instance.share(ShareParams(text: shareableString));
+              },
+            ),
+          ],
+        ),
+        body: dataItems.entries.isEmpty ?
+            Center(
+              child: Text('No data available'),
+            )
+            : ListView(
+                padding: const EdgeInsets.all(16),
+          children: [
+            NetworkInfoCard(
+              title: 'User data',
+              items: dataItems.entries
+                  .map((entry) => NetworkInfoItem(entry.key, entry.value.toString()))
+                  .toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
