@@ -59,6 +59,7 @@ class DebugHubManager {
     bool showBubbleOnStart = true,
     String? packageName,
     required Widget child,
+    Map<String, dynamic>? userProperties,
   }) {
     final config = DebugHubConfig(
       serverURL: serverURL,
@@ -66,8 +67,15 @@ class DebugHubManager {
       mainColor: mainColor ?? const Color(0xFF42d459),
       showBubbleOnStart: showBubbleOnStart,
       packageName: packageName,
+      userProperties: userProperties,
     );
     return DebugHub().wrap(child, config: config);
+  }
+
+  static void updateUserProperties(
+    Map<String, dynamic> userProperties,
+  ) {
+    DebugHub().updateUserProperties(userProperties);
   }
 
   /// Log a message with optional tag and level

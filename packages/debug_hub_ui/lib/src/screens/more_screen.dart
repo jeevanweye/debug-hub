@@ -39,24 +39,15 @@ class MoreScreen extends StatelessWidget {
 
         _buildFeatureTile(
           context,
-          icon: Icons.devices,
-          title: 'Device Details',
-          subtitle: 'View device ID and FCM token',
+          icon: Icons.phone_android_rounded,
+          title: 'User and Device Details',
+          subtitle: 'View and share user and device details',
           color: Colors.purple,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const DeviceDetailsScreen(
-                  dataItems: {
-                    'Device Name': 'Pixel 7',
-                    'Device ID': '1234567890',
-                    'Platform': 'Android',
-                    'App Version': '1.0.0',
-                    'FCM Token': 'fcm_token_goes_here',
-                    'Access Token': 'access_token_goes_here',
-                  },
-                ),
+                builder: (context) => DeviceDetailsScreen(),
               ),
             );
           },
@@ -178,25 +169,6 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  void _showStorageDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Storage Manager'),
-        content: const Text(
-          'Storage management features coming soon!\n\n'
-          'You can clear all data using the "Clear All Data" option.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showClearAllDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -236,27 +208,5 @@ class MoreScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Settings'),
-        content: const Text(
-          'Settings features coming soon!\n\n'
-          'Future features:\n'
-          '• Auto-clear old data\n'
-          '• Memory monitoring interval\n'
-          '• Export settings\n'
-          '• Theme customization',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
 }
+

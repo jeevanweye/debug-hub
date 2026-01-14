@@ -92,6 +92,7 @@ class DebugHub {
 
   /// Clear all debug data including persistent storage
   Future<void> clearAll() async {
+    if (!_isEnabled) return;
     await DebugStorage().clearAll();
   }
 
@@ -121,6 +122,11 @@ class DebugHub {
         ),
       ],
     );
+  }
+
+  void updateUserProperties(Map<String, dynamic> userProperties,) {
+    if (!_isEnabled) return;
+    _config = _config.copyWith(userProperties: userProperties);
   }
 }
 

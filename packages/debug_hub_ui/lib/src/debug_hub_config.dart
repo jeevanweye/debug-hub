@@ -67,6 +67,8 @@ class DebugHubConfig {
   /// Package name for event validation (e.g., com.example.app)
   final String? packageName;
 
+  final Map<String, dynamic>? userProperties;
+
   const DebugHubConfig({
     this.serverURL,
     this.ignoredURLs,
@@ -90,6 +92,7 @@ class DebugHubConfig {
     this.bubbleAlignment = Alignment.bottomRight,
     this.enablePerformanceMonitoring = true,
     this.packageName,
+    this.userProperties,
   });
 
   DebugHubConfig copyWith({
@@ -116,6 +119,7 @@ class DebugHubConfig {
     Alignment? bubbleAlignment,
     bool? enablePerformanceMonitoring,
     String? packageName,
+    Map<String, dynamic>? userProperties,
   }) {
     return DebugHubConfig(
       serverURL: serverURL ?? this.serverURL,
@@ -140,6 +144,7 @@ class DebugHubConfig {
       bubbleAlignment: bubbleAlignment ?? this.bubbleAlignment,
       enablePerformanceMonitoring: enablePerformanceMonitoring ?? this.enablePerformanceMonitoring,
       packageName: packageName ?? this.packageName,
+      userProperties: userProperties ?? this.userProperties,
     );
   }
 

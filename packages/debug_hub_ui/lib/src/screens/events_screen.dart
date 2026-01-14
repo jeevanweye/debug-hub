@@ -459,16 +459,14 @@ class _EventsScreenState extends State<EventsScreen> {
                                         ),
                                       ],
                                     ),
-                                    if (event.properties != null && event.properties!.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Screen Name: ${event.screenName} :: ${event.properties!.length} propert${event.properties!.length != 1 ? 'ies' : 'y'}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                        ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Screen Name: ${event.screenName}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
                                       ),
-                                    ],
+                                    ),
                                   ],
                                 ),
                               ),
