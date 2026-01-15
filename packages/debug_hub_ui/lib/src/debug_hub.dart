@@ -4,6 +4,7 @@ import 'package:base/base.dart';
 import 'package:network/network.dart';
 import 'package:non_fatal/non_fatal.dart';
 import 'package:events/events.dart';
+import 'package:log/log.dart';
 import 'package:notification/notification.dart';
 import 'debug_hub_config.dart';
 import 'widgets/debug_bubble.dart';
@@ -59,7 +60,7 @@ class DebugHub {
 
     // Enable log monitoring
     if (_config.enableLogMonitoring) {
-      // Log monitoring will be handled by the log package
+      DebugLogger().enable();
     }
 
     // Enable crash monitoring
@@ -87,6 +88,8 @@ class DebugHub {
     NetworkInterceptor().disable();
     EventTracker().disable();
     NotificationLogger().disable();
+    DebugLogger().disable();
+    CrashHandler().disable();
     debugPrint('🛑 DebugHub disabled');
   }
 
