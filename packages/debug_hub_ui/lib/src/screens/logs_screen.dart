@@ -1,3 +1,4 @@
+import 'package:base/src/widgets/upper_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:base/base.dart';
@@ -99,9 +100,7 @@ class _LogsScreenState extends State<LogsScreen> {
   void _shareAll() {
     final logs = _filteredLogs;
     if (logs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No logs to share')),
-      );
+      UpperToast.show(context, 'No logs to share');
       return;
     }
 
@@ -153,9 +152,7 @@ class _LogsScreenState extends State<LogsScreen> {
                           icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: log.toString()));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Log copied to clipboard')),
-                            );
+                            UpperToast.show(context, 'Log copied to clipboard');
                           },
                         ),
                         IconButton(

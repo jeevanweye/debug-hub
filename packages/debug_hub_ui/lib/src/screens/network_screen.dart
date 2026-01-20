@@ -79,9 +79,7 @@ class _NetworkScreenState extends State<NetworkScreen> {
   void _shareAll() {
     final requests = _filteredRequests;
     if (requests.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No requests to share')),
-      );
+      UpperToast.show(context, 'No requests to share');
       return;
     }
 

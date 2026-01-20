@@ -74,9 +74,7 @@ class _DebugBubbleState extends State<DebugBubble> {
               Navigator.of(dialogContext).pop();
               
               // Show snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('All debug data cleared')),
-              );
+              UpperToast.show(context, 'All debug data cleared');
             },
             child: const Text('Clear'),
           ),

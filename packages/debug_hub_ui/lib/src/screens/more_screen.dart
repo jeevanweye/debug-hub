@@ -193,11 +193,7 @@ class MoreScreen extends StatelessWidget {
             onPressed: () async {
               await DebugStorage().clearAll();
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('All debug data cleared'),
-                ),
-              );
+              UpperToast.show(context, 'All debug data cleared');
             },
             child: const Text(
               'Clear All',

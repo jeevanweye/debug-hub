@@ -92,9 +92,7 @@ class _EventsScreenState extends State<EventsScreen> {
   void _shareAll() {
     final events = _filteredEvents;
     if (events.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No events to share')),
-      );
+      UpperToast.show(context, 'No events to share');
       return;
     }
 
@@ -142,23 +140,27 @@ class _EventsScreenState extends State<EventsScreen> {
                   children: [
                     Text(
                       'Event Details',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.copy),
+                          icon: const Icon(Icons.copy, size: 20,),
                           onPressed: () {
                             Clipboard.setData(
-                              ClipboardData(text: JsonEncoder.withIndent('  ').convert(event.toJson())),
+                              ClipboardData(text: JsonEncoder.withIndent('  ').convert(event.toJsonSharable())),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Event copied to clipboard')),
-                            );
+                            UpperToast.show(context, 'Event copied to clipboard');
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: const Icon(Icons.share, size: 20,),
+                          onPressed: () {
+                            Share.share(JsonEncoder.withIndent('  ').convert(event.toJsonSharable()));
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20,),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],

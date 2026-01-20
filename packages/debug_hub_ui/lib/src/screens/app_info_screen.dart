@@ -83,18 +83,14 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading info: $e')));
+        UpperToast.show(context, 'Error loading info: $e');
       }
     }
   }
 
   void _copyToClipboard(String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$label copied to clipboard')));
+    UpperToast.show(context, '$label copied to clipboard');
   }
 
   void _copyAllInfo() {
@@ -129,14 +125,12 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     buffer.writeln('Storage Info:');
     buffer.writeln('  Size: $_storageSize');
     buffer.writeln('  Logs: ${_itemCounts['logs'] ?? 0}');
-    buffer.writeln('  Network Requests: ${_itemCounts['network'] ?? 0}');
-    buffer.writeln('  Crashes: ${_itemCounts['crashes'] ?? 0}');
+    buffer.writeln('  Network Requests: ${_itemCounts['networkRequests'] ?? 0}');
+    buffer.writeln('  Crashes: ${_itemCounts['crashReports'] ?? 0}');
     buffer.writeln('  Events: ${_itemCounts['events'] ?? 0}');
 
     Clipboard.setData(ClipboardData(text: buffer.toString()));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All info copied to clipboard')),
-    );
+    UpperToast.show(context, 'All info copied to clipboard');
   }
 
   Future<void> _clearAllStorage() async {
@@ -189,12 +183,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       await _loadStorageInfo();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✓ All storage cleared successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        UpperToast.show(context, '✓ All storage cleared successfully');
       }
     }
   }
@@ -453,12 +442,12 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
                 ),
                 _buildStorageChip(
                   'Network',
-                  _itemCounts['network'] ?? 0,
+                  _itemCounts['networkRequests'] ?? 0,
                   Icons.network_check,
                 ),
                 _buildStorageChip(
                   'Crashes',
-                  _itemCounts['crashes'] ?? 0,
+                  _itemCounts['crashReports'] ?? 0,
                   Icons.warning_amber,
                 ),
                 _buildStorageChip(

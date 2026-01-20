@@ -42,9 +42,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
 
   void _copyToClipboard(String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied to clipboard')),
-    );
+    UpperToast.show(context, '$label copied to clipboard');
   }
 
   void _shareRequest() {
@@ -98,9 +96,7 @@ class _NetworkDetailScreenState extends State<NetworkDetailScreen>
   void _copyAsCurl() {
     final curlCommand = widget.request.toCurl();
     Clipboard.setData(ClipboardData(text: curlCommand));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('cURL command copied to clipboard')),
-    );
+    UpperToast.show(context, 'cURL command copied to clipboard');
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:base/base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,9 +26,7 @@ class NetworkInfoCard extends StatelessWidget {
 
   void _copyToClipboard(BuildContext context, String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$label copied to clipboard')));
+    UpperToast.show(context, '$label copied to clipboard');
   }
 
   @override

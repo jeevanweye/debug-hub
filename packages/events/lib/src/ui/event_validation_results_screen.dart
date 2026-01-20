@@ -1,3 +1,4 @@
+import 'package:base/base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -152,9 +153,7 @@ class _EventValidationResultsScreenState
                                 text: JsonEncoder.withIndent('  ').convert(data),
                               ),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Event copied to clipboard')),
-                            );
+                            UpperToast.show(context, 'Event copied to clipboard');
                           },
                         ),
                         IconButton(

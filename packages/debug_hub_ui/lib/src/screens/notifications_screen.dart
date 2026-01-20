@@ -100,9 +100,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _shareAll() {
     final logs = _filteredLogs;
     if (logs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No notification logs to share')),
-      );
+      UpperToast.show(context, 'No notification logs to share');
       return;
     }
 
@@ -169,13 +167,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ).convert(log.toJson()),
                               ),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Notification log copied to clipboard',
-                                ),
-                              ),
-                            );
+                            UpperToast.show(context, 'Notification log copied to clipboard');
                           },
                         ),
                         IconButton(

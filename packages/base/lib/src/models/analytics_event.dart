@@ -47,6 +47,14 @@ class AnalyticsEvent {
     };
   }
 
+  Map<String, dynamic> toJsonSharable() {
+    return {
+      'name': name,
+      'properties': properties,
+      'source': source,
+    };
+  }
+
   factory AnalyticsEvent.fromJson(Map<String, dynamic> json) {
     return AnalyticsEvent(
       id: json['id'] as String,

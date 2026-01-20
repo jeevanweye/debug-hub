@@ -45,7 +45,7 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
               onPressed: () {
                 final shareableString =
                 dataItems.entries.map((e) => '${e.key}: ${e.value}').join('\n');
-                SharePlus.instance.share(ShareParams(text: shareableString));
+                Share.share(shareableString);
               },
             ),
           ],

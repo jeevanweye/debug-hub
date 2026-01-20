@@ -80,9 +80,7 @@ class _CrashesScreenState extends State<CrashesScreen> {
     final errorType = _getFilterLabel(_selectedFilter);
     
     if (crashes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No $errorType to share')),
-      );
+      UpperToast.show(context, 'No $errorType to share');
       return;
     }
 
@@ -138,9 +136,7 @@ class _CrashesScreenState extends State<CrashesScreen> {
                                 text: 'Error: ${crash.error}\n\nStack Trace:\n${crash.stackTrace}',
                               ),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Crash details copied to clipboard')),
-                            );
+                            UpperToast.show(context, 'Crash details copied to clipboard');
                           },
                         ),
                         IconButton(
