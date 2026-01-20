@@ -6,7 +6,6 @@ library debug_hub_manager;
 import 'package:flutter/material.dart';
 import 'package:debug_hub_ui/debug_hub_ui.dart' hide DebugHubConfig;
 import 'package:debug_hub_ui/src/debug_hub_config.dart' show DebugHubConfig;
-import 'package:debug_hub_ui/src/screens/debug_main_screen.dart';
 import 'package:base/base.dart' show AppLogLevel;
 import 'package:log/log.dart';
 import 'package:events/events.dart';
@@ -70,6 +69,10 @@ class DebugHubManager {
       userProperties: userProperties,
     );
     return DebugHub().wrap(child, config: config);
+  }
+
+  static void enableOnlyWithoutUI() {
+    DebugHub().enable();
   }
 
   static void updateUserProperties(
