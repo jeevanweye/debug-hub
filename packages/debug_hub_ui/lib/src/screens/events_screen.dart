@@ -73,9 +73,8 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  void _openEventValidation() {
-    final packageName = widget.config.packageName ?? 'com.example.app';
-    
+  Future<void> _openEventValidation() async {
+    final packageName = await AppInfo.getPackageName() ??  widget.config.packageName ?? 'com.example.app';
     Navigator.push(
       context,
       MaterialPageRoute(

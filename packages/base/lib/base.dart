@@ -17,6 +17,7 @@ export 'src/storage/persistent_storage.dart';
 // Utilities
 export 'src/utils/date_formatter.dart';
 export 'src/utils/json_formatter.dart';
+export 'src/utils/app_info.dart';
 
 // Widgets
 export 'src/widgets/upper_toast.dart';
