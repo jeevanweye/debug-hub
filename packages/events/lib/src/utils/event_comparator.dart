@@ -21,22 +21,20 @@ class EventComparator {
 
       bool found = false;
       SheetEventInfo? matchedDevEvent;
-
+      bool isCorrect = false;
       // Try to find matching event in logged events
       for (final loggedEvent in loggedEvents) {
         final devEvent = _convertAnalyticsEventToSheetEvent(loggedEvent);
-        
-        if (_eventsMatch(sheetEvent, devEvent)) {
+        if (sheetEvent.matches(devEvent)) {
           found = true;
           matchedDevEvent = devEvent;
+          isCorrect = true;
           break;
+        } else if (_eventsMatch(sheetEvent, devEvent)) {
+          found = true;
+          matchedDevEvent = devEvent;
         }
       }
-
-      // Create updated report info
-      final isCorrect = found && matchedDevEvent != null 
-          ? sheetEvent.matches(matchedDevEvent)
-          : false;
 
       updatedSheetEvents.add(
         sheetEventInfo.copyWith(
@@ -52,7 +50,7 @@ class EventComparator {
 
   /// Check if two events match based on event name
   static bool _eventsMatch(SheetEventInfo sheetEvent, SheetEventInfo devEvent) {
-    return sheetEvent.eventName == devEvent.eventName;
+    return sheetEvent.eventName == devEvent.eventName && sheetEvent.screenName == devEvent.screenName;
   }
 
   /// Convert AnalyticsEvent to SheetEventInfo for comparison

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
 import '../models/event_report_info.dart';
+import '../models/sheet_event_info.dart';
 import '../utils/event_comparator.dart';
 
 /// Screen to display event validation results
@@ -179,7 +180,7 @@ class _EventValidationResultsScreenState
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _buildEventInfoCard(event.sheetEvent),
+                      _buildEventInfoCard(event.sheetEvent!),
                       const SizedBox(height: 16),
                       const Text(
                         'Found (Device)',
@@ -257,7 +258,7 @@ class _EventValidationResultsScreenState
     );
   }
 
-  Widget _buildEventInfoCard(dynamic event) {
+  Widget _buildEventInfoCard(SheetEventInfo event) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -269,7 +270,7 @@ class _EventValidationResultsScreenState
             _buildDetailRow('Event Category', event.eventCategory),
             _buildDetailRow('Screen Name', event.screenName),
             if (event.vehicleId != null)
-              _buildDetailRow('Vehicle ID', event.vehicleId),
+              _buildDetailRow('Vehicle ID/Demand Id', event.vehicleId),
             if (event.entity != null) _buildDetailRow('Entity', event.entity),
             if (event.miscellaneous != null)
               _buildDetailRow('Miscellaneous', event.miscellaneous),

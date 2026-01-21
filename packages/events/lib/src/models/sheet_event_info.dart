@@ -19,8 +19,25 @@ class SheetEventInfo with _$SheetEventInfo {
     @JsonKey(name: 'target_product') String? targetProduct,
   }) = _SheetEventInfo;
 
-  factory SheetEventInfo.fromJson(Map<String, dynamic> json) =>
-      _$SheetEventInfoFromJson(json);
+  factory SheetEventInfo.fromJson(Map<String, dynamic> json) {
+    // Normalize JSON to handle both vehicle_id and demand_id
+    final normalizedJson = Map<String, dynamic>.from(json);
+    
+    // Get vehicle_id value (may be null or empty)
+    final vehicleIdValue = normalizedJson['vehicle_id'];
+    final demandIdValue = normalizedJson['demand_id'];
+    
+    // Use demand_id if vehicle_id is missing, null, or empty
+    if ((vehicleIdValue == null || 
+         vehicleIdValue.toString().trim().isEmpty) && 
+        demandIdValue != null && 
+        demandIdValue.toString().trim().isNotEmpty) {
+      normalizedJson['vehicle_id'] = demandIdValue;
+    }
+    
+    // Call the generated implementation directly to avoid recursion
+    return _$$SheetEventInfoImplFromJson(normalizedJson);
+  }
 
   factory SheetEventInfo.fromSheetRow(List<dynamic> row) {
     return SheetEventInfo(

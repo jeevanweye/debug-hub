@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/master_sheet_info.dart';
@@ -147,7 +149,7 @@ class _EventValidationDashboardScreenState
       // Find configuration for this package
       final config = _repository.findSheetForPackage(
         masterSheets: masterSheets,
-        packageName: widget.packageName,
+        packageName: Platform.isIOS ? '${widget.packageName}.ios' : widget.packageName,
       );
 
       if (config == null) {
@@ -369,7 +371,7 @@ class _EventValidationDashboardScreenState
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _loadSheetConfiguration,
+              onPressed: _signIn,
               child: const Text('Retry'),
             ),
           ],

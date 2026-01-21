@@ -52,20 +52,12 @@ class DebugHubManager {
   /// );
   /// ```
   static Widget initialize({
-    String? serverURL,
-    List<String>? ignoredURLs,
     Color? mainColor,
-    bool showBubbleOnStart = true,
-    String? packageName,
     required Widget child,
     Map<String, dynamic>? userProperties,
   }) {
     final config = DebugHubConfig(
-      serverURL: serverURL,
-      ignoredURLs: ignoredURLs,
       mainColor: mainColor ?? const Color(0xFF42d459),
-      showBubbleOnStart: showBubbleOnStart,
-      packageName: packageName,
       userProperties: userProperties,
     );
     return DebugHub().wrap(child, config: config);

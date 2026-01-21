@@ -54,9 +54,6 @@ class NetworkRequestTile extends StatelessWidget {
 
   String _getDisplayUrl() {
     String url = request.url;
-    if (config.serverURL != null && url.contains(config.serverURL!)) {
-      return url.replaceAll(config.serverURL!, '');
-    }
     return url;
   }
 

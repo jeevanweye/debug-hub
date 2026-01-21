@@ -21,11 +21,11 @@ class DebugStorage implements
   factory DebugStorage() => _instance;
   DebugStorage._internal();
 
-  final int maxLogs = 1000;
-  final int maxNetworkRequests = 500;
-  final int maxCrashReports = 100;
-  final int maxEvents = 1000;
-  final int maxNotificationLogs = 500;
+  final int maxLogs = 1500;
+  final int maxNetworkRequests = 1000;
+  final int maxCrashReports = 500;
+  final int maxEvents = 1500;
+  final int maxNotificationLogs = 1000;
 
   final _logs = Queue<DebugLog>();
   final _networkRequests = Queue<NetworkRequest>();
