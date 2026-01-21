@@ -18,6 +18,11 @@ class EventValidationRepository {
   })  : _sheetsService = sheetsService ?? GoogleSheetsService(),
         _storage = storage ?? DebugStorage();
 
+  /// Initialize the repository and attempt silent sign-in
+  Future<void> initialize() async {
+    await _sheetsService.initialize();
+  }
+
   /// Get master sheet configuration for the current app
   Future<List<MasterSheetInfo>> getMasterSheetInfo() async {
     return await _sheetsService.getMasterSheetInfo(

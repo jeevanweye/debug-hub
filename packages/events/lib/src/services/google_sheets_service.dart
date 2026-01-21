@@ -12,7 +12,19 @@ import '../models/sheet_event_info.dart';
 class GoogleSheetsService {
   static final GoogleSheetsService _instance = GoogleSheetsService._internal();
   factory GoogleSheetsService() => _instance;
-  GoogleSheetsService._internal();
+  GoogleSheetsService._internal() {
+    // Set up listener once during construction
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
+      _currentUser = account;
+      if (account != null) {
+        _initializeSheetsApi(account);
+        debugPrint('✅ User signed in: ${account.email}');
+      } else {
+        _sheetsApi = null;
+        debugPrint('ℹ️ User signed out');
+      }
+    });
+  }
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [sheets.SheetsApi.spreadsheetsScope],
@@ -20,18 +32,33 @@ class GoogleSheetsService {
 
   sheets.SheetsApi? _sheetsApi;
   GoogleSignInAccount? _currentUser;
+  bool _isInitialized = false;
 
   /// Initialize Google Sign-In
   Future<void> initialize() async {
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
-      _currentUser = account;
-      if (account != null) {
-        _initializeSheetsApi(account);
-      }
-    });
+    // Only initialize once
+    if (_isInitialized) {
+      debugPrint('ℹ️ GoogleSheetsService already initialized');
+      return;
+    }
 
-    // Try to sign in silently
-    await _googleSignIn.signInSilently();
+    _isInitialized = true;
+
+    // Try to sign in silently to restore previous session
+    try {
+      debugPrint('🔄 Attempting silent sign-in...');
+      final account = await _googleSignIn.signInSilently();
+      if (account != null) {
+        _currentUser = account;
+        await _initializeSheetsApi(account);
+        debugPrint('✅ Silent sign-in successful: ${account.email}');
+      } else {
+        debugPrint('ℹ️ No previous sign-in found');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Silent sign-in failed: $e');
+      // Silent sign-in failure is not critical, user can sign in manually
+    }
   }
 
   /// Sign in with Google
@@ -61,11 +88,32 @@ class GoogleSheetsService {
     }
   }
 
-  /// Sign out
+  /// Sign out (keeps credentials for silent sign-in)
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    _sheetsApi = null;
-    _currentUser = null;
+    try {
+      debugPrint('🔄 Signing out...');
+      await _googleSignIn.signOut();
+      _sheetsApi = null;
+      _currentUser = null;
+      debugPrint('✅ Signed out successfully');
+    } catch (e) {
+      debugPrint('⚠️ Sign out error: $e');
+      rethrow;
+    }
+  }
+
+  /// Disconnect completely (removes all credentials)
+  Future<void> disconnect() async {
+    try {
+      debugPrint('🔄 Disconnecting...');
+      await _googleSignIn.disconnect();
+      _sheetsApi = null;
+      _currentUser = null;
+      debugPrint('✅ Disconnected successfully');
+    } catch (e) {
+      debugPrint('⚠️ Disconnect error: $e');
+      rethrow;
+    }
   }
 
   /// Check if user is signed in
@@ -73,6 +121,9 @@ class GoogleSheetsService {
 
   /// Get current user
   GoogleSignInAccount? get currentUser => _currentUser;
+
+  /// Check if service is initialized
+  bool get isInitialized => _isInitialized;
 
   Future<void> _initializeSheetsApi(GoogleSignInAccount account) async {
     final authHeaders = await account.authHeaders;

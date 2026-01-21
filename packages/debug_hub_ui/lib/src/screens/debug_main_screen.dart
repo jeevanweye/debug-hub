@@ -79,10 +79,10 @@ class _DebugMainScreenState extends State<DebugMainScreen> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black,
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 8,
                 spreadRadius: 0,
-                offset: const Offset(0, 10),
+                offset: const Offset(0, -10),
               ),
             ],
           ),

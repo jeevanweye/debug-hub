@@ -330,167 +330,170 @@ class _EventValidationResultsScreenState
     final filteredResults = _filteredResults;
     final mainColor = (widget.config as dynamic)?.mainColor ?? Colors.blue;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Results - ${widget.versionName}'),
-        backgroundColor: mainColor,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: _shareResults,
-            tooltip: 'Share Results',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Statistics Card
-          Card(
-            margin: const EdgeInsets.all(8),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Summary',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Results - ${widget.versionName}'),
+          backgroundColor: mainColor,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: _shareResults,
+              tooltip: 'Share Results',
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Statistics Card
+            Card(
+              margin: const EdgeInsets.all(8),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Summary',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem(
-                        'Total',
-                        stats.total.toString(),
-                        Colors.blue,
-                      ),
-                      _buildStatItem(
-                        'Correct',
-                        '${stats.correct}\n${stats.correctPercentage.toStringAsFixed(1)}%',
-                        Colors.green,
-                      ),
-                      _buildStatItem(
-                        'Not Found',
-                        '${stats.notFound}\n${stats.notFoundPercentage.toStringAsFixed(1)}%',
-                        Colors.red,
-                      ),
-                      _buildStatItem(
-                        'Incorrect',
-                        '${stats.foundButIncorrect}\n${stats.foundButIncorrectPercentage.toStringAsFixed(1)}%',
-                        Colors.orange,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Filter Chips
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            color: Colors.grey[100],
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildFilterChip('All', 'all', stats.total),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Correct', 'correct', stats.correct),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Incorrect', 'incorrect', stats.foundButIncorrect),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Not Found', 'notFound', stats.notFound),
-                ],
-              ),
-            ),
-          ),
-
-          // Results List
-          Expanded(
-            child: filteredResults.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon(
-                          Icons.filter_list_off,
-                          size: 64,
-                          color: Colors.grey[400],
+                        _buildStatItem(
+                          'Total',
+                          stats.total.toString(),
+                          Colors.blue,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No events in this filter',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
+                        _buildStatItem(
+                          'Correct',
+                          '${stats.correct}\n${stats.correctPercentage.toStringAsFixed(1)}%',
+                          Colors.green,
+                        ),
+                        _buildStatItem(
+                          'Not Found',
+                          '${stats.notFound}\n${stats.notFoundPercentage.toStringAsFixed(1)}%',
+                          Colors.red,
+                        ),
+                        _buildStatItem(
+                          'Incorrect',
+                          '${stats.foundButIncorrect}\n${stats.foundButIncorrectPercentage.toStringAsFixed(1)}%',
+                          Colors.orange,
                         ),
                       ],
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: filteredResults.length,
-                    itemBuilder: (context, index) {
-                      final event = filteredResults[index];
-                      return InkWell(
-                        onTap: () => _showEventDetail(event),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey[300]!),
+                  ],
+                ),
+              ),
+            ),
+
+            // Filter Chips
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              color: Colors.grey[100],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildFilterChip('All', 'all', stats.total),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Correct', 'correct', stats.correct),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Incorrect', 'incorrect', stats.foundButIncorrect),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Not Found', 'notFound', stats.notFound),
+                  ],
+                ),
+              ),
+            ),
+
+            // Results List
+            Expanded(
+              child: filteredResults.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.filter_list_off,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No events in this filter',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                _getStatusIcon(event),
-                                color: _getStatusColor(event),
-                                size: 24,
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredResults.length,
+                      itemBuilder: (context, index) {
+                        final event = filteredResults[index];
+                        return InkWell(
+                          onTap: () => _showEventDetail(event),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: Colors.grey[300]!),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      event.sheetEvent?.eventName ?? 'Unknown',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      _formatEventDetails(event.sheetEvent),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _getStatusIcon(event),
+                                  color: _getStatusColor(event),
+                                  size: 24,
                                 ),
-                              ),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: Colors.grey,
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        event.sheetEvent?.eventName ?? 'Unknown',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        _formatEventDetails(event.sheetEvent),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.grey,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

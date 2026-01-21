@@ -37,16 +37,37 @@ class _EventValidationDashboardScreenState
   @override
   void initState() {
     super.initState();
-    _checkSignInStatus();
+    _initializeAndCheckSignIn();
   }
 
-  void _checkSignInStatus() {
+  Future<void> _initializeAndCheckSignIn() async {
     setState(() {
-      _isSignedIn = _repository.isSignedIn;
+      _isLoading = true;
+      _errorMessage = null;
     });
-    
-    if (_isSignedIn) {
-      _loadSheetConfiguration();
+
+    try {
+      // Initialize repository (attempts silent sign-in)
+      await _repository.initialize();
+      
+      setState(() {
+        _isSignedIn = _repository.isSignedIn;
+      });
+      
+      if (_isSignedIn) {
+        // User is signed in, load sheet configuration
+        await _loadSheetConfiguration();
+      }
+    } catch (e) {
+      // Silent sign-in failure is not critical, just log it
+      debugPrint('Initialization error: $e');
+      setState(() {
+        _isSignedIn = false;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -194,7 +215,7 @@ class _EventValidationDashboardScreenState
       final sheetEvents = await _repository.getSheetEventData(
         sheetId: _sheetConfig!.sheetId!,
         versionName: _selectedVersion!.title!,
-        range: _sheetConfig!.range ?? '!A2:I',
+        range: _sheetConfig!.range!,
       );
 
       // Validate events
@@ -230,21 +251,24 @@ class _EventValidationDashboardScreenState
   Widget build(BuildContext context) {
     final mainColor = widget.config?.mainColor ?? Colors.blue;
     
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Event Validation'),
-        backgroundColor: mainColor,
-        foregroundColor: Colors.white,
-        actions: [
-          if (_isSignedIn)
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: _signOut,
-              tooltip: 'Sign Out',
-            ),
-        ],
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Event Validation'),
+          backgroundColor: mainColor,
+          foregroundColor: Colors.white,
+          actions: [
+            if (_isSignedIn)
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: _signOut,
+                tooltip: 'Sign Out',
+              ),
+          ],
+        ),
+        body: _buildBody(),
       ),
-      body: _buildBody(),
     );
   }
 
@@ -419,8 +443,6 @@ class _EventValidationDashboardScreenState
             ),
             const Divider(),
             _buildInfoRow('Package', widget.packageName),
-            _buildInfoRow('Sheet ID', _sheetConfig?.sheetId ?? 'N/A'),
-            _buildInfoRow('Range', _sheetConfig?.range ?? 'N/A'),
             if (_repository.currentUserEmail != null)
               _buildInfoRow('Signed in as', _repository.currentUserEmail!),
           ],
@@ -489,7 +511,11 @@ class _EventValidationDashboardScreenState
               items: _versions.map((version) {
                 return DropdownMenuItem(
                   value: version,
-                  child: Text(version.title ?? 'Unknown'),
+                  child: Text(
+                    version.title ?? 'Unknown',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
