@@ -474,6 +474,9 @@ class _LogsScreenState extends State<LogsScreen> {
                                         ],
                                         const Spacer(),
                                         Text(
+                                          '${log.timestamp.year.toString().padLeft(2, '0')}-'
+                                              '${log.timestamp.month.toString().padLeft(2, '0')}-'
+                                              '${log.timestamp.day.toString().padLeft(2, '0')} ::'
                                           '${log.timestamp.hour.toString().padLeft(2, '0')}:'
                                           '${log.timestamp.minute.toString().padLeft(2, '0')}:'
                                           '${log.timestamp.second.toString().padLeft(2, '0')}',

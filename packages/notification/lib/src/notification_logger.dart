@@ -27,11 +27,14 @@ class NotificationLogger {
   /// [body] - Notification body/message
   /// [payload] - Additional notification data/payload
   /// [notificationId] - Unique identifier for the notification
+  /// [notoification_source] - CleverTap/Firebase
   void logNotificationReceived({
     String? title,
     String? body,
     Map<String, dynamic>? payload,
     String? notificationId,
+    String? notificationSource,
+    String? mode,
   }) {
     if (!_isEnabled) return;
 
@@ -40,6 +43,8 @@ class NotificationLogger {
       body: body,
       payload: payload,
       notificationId: notificationId,
+      notificationSource: notificationSource,
+      mode: mode,
     );
 
     _storage.addNotificationLog(log);
@@ -51,23 +56,6 @@ class NotificationLogger {
   /// [title] - Notification title (optional, for reference)
   /// [body] - Notification body/message (optional, for reference)
   /// [payload] - Additional notification data/payload (optional, for reference)
-  void logNotificationTapped({
-    required String notificationId,
-    String? title,
-    String? body,
-    Map<String, dynamic>? payload,
-  }) {
-    if (!_isEnabled) return;
-
-    final log = NotificationLog.createTapped(
-      notificationId: notificationId,
-      title: title,
-      body: body,
-      payload: payload,
-    );
-
-    _storage.addNotificationLog(log);
-  }
 
   /// Get all notification logs
   List<NotificationLog> getNotificationLogs() {
@@ -75,9 +63,9 @@ class NotificationLogger {
   }
 
   /// Get notification logs filtered by type
-  List<NotificationLog> getNotificationLogsByType(NotificationType type) {
+  List<NotificationLog> getNotificationLogsByType(NotificationSource source) {
     return _storage.getNotificationLogs()
-        .where((log) => log.type == type)
+        .where((log) => log.source == source)
         .toList();
   }
 
