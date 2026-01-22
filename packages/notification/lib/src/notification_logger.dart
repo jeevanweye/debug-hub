@@ -27,11 +27,13 @@ class NotificationLogger {
   /// [body] - Notification body/message
   /// [payload] - Additional notification data/payload
   /// [notificationId] - Unique identifier for the notification
+  /// [notoification_source] - CleverTap/Firebase
   void logNotificationReceived({
     String? title,
     String? body,
     Map<String, dynamic>? payload,
     String? notificationId,
+    String? notificationSource,
   }) {
     if (!_isEnabled) return;
 
@@ -40,6 +42,7 @@ class NotificationLogger {
       body: body,
       payload: payload,
       notificationId: notificationId,
+      notificationSource: notificationSource,
     );
 
     _storage.addNotificationLog(log);
@@ -56,6 +59,7 @@ class NotificationLogger {
     String? title,
     String? body,
     Map<String, dynamic>? payload,
+    String? notificationSource,
   }) {
     if (!_isEnabled) return;
 

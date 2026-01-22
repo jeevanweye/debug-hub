@@ -133,6 +133,29 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     Share.share(buffer.toString(), subject: 'DebugHub Notification Logs');
   }
 
+  dynamic _tryDecode(dynamic value) {
+    if (value is String) {
+      try {
+        final decoded = jsonDecode(value);
+        return decoded;
+      } catch (_) {
+        return value;
+      }
+    }
+    return value;
+  }
+
+  Map<String, dynamic> _normalizePayload(Map<String, dynamic> payload) {
+    final result = <String, dynamic>{};
+
+    payload.forEach((key, value) {
+      result[key] = _tryDecode(value);
+    });
+
+    return result;
+  }
+
+
   void _showLogDetail(NotificationLog log) {
     showModalBottomSheet(
       context: context,
@@ -223,7 +246,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             border: Border.all(color: Colors.grey[300]!),
                           ),
                           child: SelectableText(
-                            JsonEncoder.withIndent('  ').convert(log.payload),
+                            const JsonEncoder.withIndent('  ').convert(
+                              _normalizePayload(log.payload!),
+                            ),
                             style: const TextStyle(
                               fontFamily: 'monospace',
                               fontSize: 12,
@@ -231,6 +256,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ),
                         ),
                       ],
+
                     ],
                   ),
                 ),

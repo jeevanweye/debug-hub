@@ -45,6 +45,21 @@ class DebugHub {
     return true;
   }
 
+  Future<void> initWithoutUI({DebugHubConfig? config}) async {
+
+    if (config != null) {
+      _config = config;
+    }
+
+    // Initialize persistent storage asynchronously (non-blocking)
+    await DebugStorage().initialize().catchError((error) {
+      debugPrint('⚠️ DebugHub: Failed to initialize storage: $error');
+    });
+
+    enable();
+    return;
+  }
+
   /// Enable DebugHub
   /// Returns false if not in debug mode
   bool enable() {

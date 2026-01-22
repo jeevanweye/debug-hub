@@ -28,6 +28,7 @@ class NotificationLog {
     String? body,
     Map<String, dynamic>? payload,
     String? notificationId,
+    String? notificationSource,
   }) {
     return NotificationLog(
       id: '${DateTime.now().millisecondsSinceEpoch}_${notificationId ?? 'unknown'}',

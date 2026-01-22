@@ -71,8 +71,8 @@ class DebugHubManager {
     return DebugHub().wrap(child, config: config);
   }
 
-  static void enableOnlyWithoutUI() {
-    DebugHub().enable();
+  static Future<void> enableOnlyWithoutUI() async {
+    await DebugHub().initWithoutUI();
   }
 
   static void updateUserProperties(
