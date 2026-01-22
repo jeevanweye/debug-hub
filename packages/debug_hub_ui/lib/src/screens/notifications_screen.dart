@@ -1,8 +1,10 @@
+import 'dart:convert';
+
+import 'package:base/base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:base/base.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:convert';
+
 import '../debug_hub_config.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -16,58 +18,74 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final DebugStorage _storage = DebugStorage();
+
   String _searchQuery = '';
-  NotificationType? _selectedType;
+  NotificationSource? _selectedSource;
+  NotificationMode? _selectedMode;
 
   List<NotificationLog> get _filteredLogs {
     var logs = _storage.getNotificationLogs().reversed.toList();
 
-    // Apply search filter
+    // Search filter
     if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
       logs = logs.where((log) {
-        return (log.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
-                false) ||
-            (log.body?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
-                false) ||
-            (log.notificationId?.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ??
-                false);
+        return (log.title?.toLowerCase().contains(query) ?? false) ||
+            (log.body?.toLowerCase().contains(query) ?? false) ||
+            (log.notificationId?.toLowerCase().contains(query) ?? false) ||
+            log.source.name.toLowerCase().contains(query) ||
+            log.mode.name.toLowerCase().contains(query);
       }).toList();
     }
 
-    // Apply type filter
-    if (_selectedType != null) {
-      logs = logs.where((log) => log.type == _selectedType).toList();
+    // Source filter
+    if (_selectedSource != null) {
+      logs = logs.where((log) => log.source == _selectedSource).toList();
+    }
+
+    // Mode filter
+    if (_selectedMode != null) {
+      logs = logs.where((log) => log.mode == _selectedMode).toList();
     }
 
     return logs;
   }
 
-  Color _getTypeColor(NotificationType type) {
-    switch (type) {
-      case NotificationType.received:
+  Color _getSourceColor(NotificationMode mode) {
+    switch (mode) {
+      case NotificationMode.foreground:
         return Colors.blue;
-      case NotificationType.tapped:
+      case NotificationMode.background:
         return Colors.green;
     }
   }
 
-  IconData _getTypeIcon(NotificationType type) {
-    switch (type) {
-      case NotificationType.received:
-        return Icons.notifications;
-      case NotificationType.tapped:
-        return Icons.touch_app;
+
+
+  IconData _getModeIcon(NotificationMode mode) {
+    switch (mode) {
+      case NotificationMode.foreground:
+        return Icons.mobile_friendly;
+      case NotificationMode.background:
+        return Icons.notifications_active_outlined;
     }
   }
 
-  String _getTypeLabel(NotificationType type) {
-    switch (type) {
-      case NotificationType.received:
-        return 'Received';
-      case NotificationType.tapped:
-        return 'Tapped';
+  String _getModeLabel(NotificationMode mode) {
+    switch (mode) {
+      case NotificationMode.foreground:
+        return 'Foreground';
+      case NotificationMode.background:
+        return 'Background';
+    }
+  }
+
+  String _getSourceLabel(NotificationSource source) {
+    switch (source) {
+      case NotificationSource.firebase:
+        return 'Firebase';
+      case NotificationSource.clevertap:
+        return 'CleverTap';
     }
   }
 
@@ -76,9 +94,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Notification Logs'),
-        content: const Text(
-          'Are you sure you want to clear all notification logs?',
-        ),
+        content: const Text('Are you sure you want to clear all notification logs?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -112,20 +128,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     buffer.writeln('=' * 50);
     buffer.writeln();
 
-    for (var log in logs) {
+    for (final log in logs) {
       buffer.writeln(
-        '[${_getTypeLabel(log.type).toUpperCase()}] ${log.timestamp}',
+        '[${_getModeLabel(log.mode).toUpperCase()}] ${log.timestamp.toIso8601String()}',
       );
-      if (log.notificationId != null)
-        buffer.writeln('ID: ${log.notificationId}');
+      buffer.writeln('Source: ${log.source.name}');
+      if (log.notificationId != null) buffer.writeln('Notification ID: ${log.notificationId}');
       if (log.title != null) buffer.writeln('Title: ${log.title}');
       if (log.body != null) buffer.writeln('Body: ${log.body}');
       if (log.payload != null && log.payload!.isNotEmpty) {
         buffer.writeln('Payload:');
-        buffer.writeln(JsonEncoder.withIndent('  ').convert(log.payload));
-      }
-      if (log.wasTapped && log.tappedAt != null) {
-        buffer.writeln('Tapped At: ${log.tappedAt}');
+        buffer.writeln(JsonEncoder.withIndent('  ').convert(_normalizePayload(log.payload!)));
       }
       buffer.writeln('-' * 50);
     }
@@ -136,8 +149,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   dynamic _tryDecode(dynamic value) {
     if (value is String) {
       try {
-        final decoded = jsonDecode(value);
-        return decoded;
+        return jsonDecode(value);
       } catch (_) {
         return value;
       }
@@ -147,14 +159,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Map<String, dynamic> _normalizePayload(Map<String, dynamic> payload) {
     final result = <String, dynamic>{};
-
     payload.forEach((key, value) {
       result[key] = _tryDecode(value);
     });
-
     return result;
   }
-
 
   void _showLogDetail(NotificationLog log) {
     showModalBottomSheet(
@@ -185,9 +194,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           onPressed: () {
                             Clipboard.setData(
                               ClipboardData(
-                                text: JsonEncoder.withIndent(
-                                  '  ',
-                                ).convert(log.toJson()),
+                                text: JsonEncoder.withIndent('  ').convert(log.toJson()),
                               ),
                             );
                             UpperToast.show(context, 'Notification log copied to clipboard');
@@ -207,35 +214,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     controller: scrollController,
                     children: [
                       _buildDetailRow(
-                        'Type',
-                        _getTypeLabel(log.type),
-                        _getTypeColor(log.type),
+                        'Mode',
+                        _getModeLabel(log.mode),
+                        null,
+                      ),
+                      _buildDetailRow(
+                        'Source',
+                        _getSourceLabel(log.source),
+                        _getSourceColor(log.mode),
                       ),
                       _buildDetailRow('Time', log.timestamp.toString(), null),
+                      _buildDetailRow('Log ID', log.id, null),
                       if (log.notificationId != null)
-                        _buildDetailRow(
-                          'Notification ID',
-                          log.notificationId!,
-                          null,
-                        ),
-                      if (log.title != null)
-                        _buildDetailRow('Title', log.title!, null),
-                      if (log.body != null)
-                        _buildDetailRow('Body', log.body!, null),
-                      if (log.wasTapped && log.tappedAt != null)
-                        _buildDetailRow(
-                          'Tapped At',
-                          log.tappedAt!.toString(),
-                          Colors.green,
-                        ),
+                        _buildDetailRow('Notification ID', log.notificationId!, null),
+                      if (log.title != null) _buildDetailRow('Title', log.title!, null),
+                      if (log.body != null) _buildDetailRow('Body', log.body!, null),
                       if (log.payload != null && log.payload!.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         const Text(
                           'Payload',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -246,9 +244,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             border: Border.all(color: Colors.grey[300]!),
                           ),
                           child: SelectableText(
-                            const JsonEncoder.withIndent('  ').convert(
-                              _normalizePayload(log.payload!),
-                            ),
+                            const JsonEncoder.withIndent('  ')
+                                .convert(_normalizePayload(log.payload!)),
                             style: const TextStyle(
                               fontFamily: 'monospace',
                               fontSize: 12,
@@ -256,7 +253,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ),
                         ),
                       ],
-
                     ],
                   ),
                 ),
@@ -305,53 +301,42 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               decoration: InputDecoration(
                 hintText: 'Search notifications...',
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 8),
               ),
               onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
+                setState(() => _searchQuery = value);
               },
             ),
           ),
 
-          // Type filter chips
+          // Filters (Source + Mode)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             color: Colors.grey[100],
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
+                  // MODE FILTERS
                   FilterChip(
-                    label: const Text('All'),
-                    selected: _selectedType == null,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedType = null;
-                      });
-                    },
+                    label: const Text('All Modes'),
+                    selected: _selectedMode == null,
+                    onSelected: (_) => setState(() => _selectedMode = null),
                   ),
                   const SizedBox(width: 8),
-                  ...NotificationType.values.map((type) {
-                    final isSelected = _selectedType == type;
+                  ...NotificationMode.values.map((mode) {
+                    final isSelected = _selectedMode == mode;
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(_getTypeLabel(type)),
+                        label: Text(_getModeLabel(mode)),
                         selected: isSelected,
                         onSelected: (selected) {
-                          setState(() {
-                            _selectedType = selected ? type : null;
-                          });
+                          setState(() => _selectedMode = selected ? mode : null);
                         },
-                        selectedColor: _getTypeColor(type).withAlpha(25),
-                        checkmarkColor: _getTypeColor(type),
                       ),
                     );
                   }),
@@ -398,139 +383,144 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Expanded(
             child: logs.isEmpty
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_none, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No notification logs',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Notification logs will appear here',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
+            )
+                : ListView.builder(
+              itemCount: logs.length,
+              itemBuilder: (context, index) {
+                final log = logs[index];
+
+                return InkWell(
+                  onTap: () => _showLogDetail(log),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey[300]!),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.notifications_none,
-                          size: 64,
-                          color: Colors.grey[400],
+                          _getModeIcon(log.mode),
+                          color: _getSourceColor(log.mode),
+                          size: 24,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No notification logs',
-                          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Notification logs will appear here',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: logs.length,
-                    itemBuilder: (context, index) {
-                      final log = logs[index];
-                      return InkWell(
-                        onTap: () => _showLogDetail(log),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey[300]!),
-                            ),
-                          ),
-                          child: Row(
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                _getTypeIcon(log.type),
-                                color: _getTypeColor(log.type),
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getTypeColor(log.type),
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            _getTypeLabel(log.type).toUpperCase(),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          '${log.timestamp.hour.toString().padLeft(2, '0')}:'
-                                          '${log.timestamp.minute.toString().padLeft(2, '0')}:'
-                                          '${log.timestamp.second.toString().padLeft(2, '0')}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
                                     ),
-                                    const SizedBox(height: 4),
-                                    if (log.title != null) ...[
-                                      Text(
-                                        log.title!,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                    decoration: BoxDecoration(
+                                      color: _getSourceColor(log.mode),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '${_getSourceLabel(log.source)} • ${_getModeLabel(log.mode)}'
+                                          .toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      const SizedBox(height: 2),
-                                    ],
-                                    if (log.body != null)
-                                      Text(
-                                        log.body!,
-                                        style: const TextStyle(fontSize: 13),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    if (log.notificationId != null) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'ID: ${log.notificationId}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                    if (log.payload != null &&
-                                        log.payload!.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    '${log.timestamp.hour.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.minute.toString().padLeft(2, '0')}:'
+                                        '${log.timestamp.second.toString().padLeft(2, '0')}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
+                              const SizedBox(height: 4),
+                              if (log.title != null) ...[
+                                Text(
+                                  log.title!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                              ],
+                              if (log.body != null)
+                                Text(
+                                  log.body!,
+                                  style: const TextStyle(fontSize: 13),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              if (log.notificationId != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  'ID: ${log.notificationId}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                              const SizedBox(height: 4),
+                              Text(
+                                'source: ${log.source.name} | mode: ${log.mode.name}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (log.payload != null && log.payload!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${log.payload!.length} payload key${log.payload!.length != 1 ? 's' : ''}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),

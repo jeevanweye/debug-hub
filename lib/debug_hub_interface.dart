@@ -174,47 +174,18 @@ class DebugHubManager {
     String? body,
     Map<String, dynamic>? payload,
     String? notificationId,
+    String? notificationSource,
+    String? mode,
   }) {
     NotificationLogger().logNotificationReceived(
       title: title,
       body: body,
       payload: payload,
       notificationId: notificationId,
+      notificationSource: notificationSource,
+      mode: mode,
     );
   }
-
-  /// Log a notification tap
-  ///
-  /// Call this when user taps on a notification.
-  ///
-  /// Parameters:
-  /// - [notificationId]: Unique notification identifier (required)
-  /// - [title]: Notification title
-  /// - [body]: Notification body text
-  /// - [payload]: Additional data payload
-  ///
-  /// Example:
-  /// ```dart
-  /// DebugHubManager.logNotificationTap(
-  ///   notificationId: 'notif_123',
-  ///   title: 'New Message',
-  ///   payload: {'action': 'open_chat'},
-  /// );
-  /// ```
-  static void logNotificationTap({
-    required String notificationId,
-    String? title,
-    String? body,
-    Map<String, dynamic>? payload,
-  }) {
-    NotificationLogger().logNotificationTapped(
-      notificationId: notificationId,
-      title: title,
-      body: body,
-      payload: payload,
-    );
-  }
-
   /// Report a non-fatal crash or error
   ///
   /// Use this to manually report errors that don't crash the app.
