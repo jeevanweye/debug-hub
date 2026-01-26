@@ -10,68 +10,65 @@ class DebugDioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final requestId = _interceptor.captureRequest(
-      url: options.uri.toString(),
-      method: options.method,
-      headers: options.headers.map((key, value) => MapEntry(key, value.toString())),
-      body: options.data,
-    );
-
-    _requestIds[options] = requestId;
+    super.onRequest(options, handler);
+    final id = '${DateTime.now().millisecondsSinceEpoch}_${options.uri.toString().hashCode}';
+    _requestIds[options] = id;
     _requestTimes[options] = DateTime.now();
-
-    handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    super.onResponse(response, handler);
     final requestId = _requestIds[response.requestOptions];
     final requestTime = _requestTimes[response.requestOptions];
-
     if (requestId != null && requestTime != null) {
       final duration = DateTime.now().difference(requestTime);
-
-      _interceptor.captureResponse(
+      final requestOptions = response.requestOptions;
+      _interceptor.captureNetworkData(
         id: requestId,
+        url: requestOptions.uri.toString(),
+        method: requestOptions.method,
+        requestHeaders: requestOptions.headers.map((key, value) =>
+            MapEntry(key, value.toString())),
+        requestBody: requestOptions.data,
         statusCode: response.statusCode,
         responseBody: response.data,
         responseHeaders: response.headers.map.map(
-          (key, value) => MapEntry(key, value.join(', ')),
+              (key, value) => MapEntry(key, value.join(', ')),
         ),
         duration: duration,
       );
-
       _requestIds.remove(response.requestOptions);
       _requestTimes.remove(response.requestOptions);
     }
-
-    handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    super.onError(err, handler);
     final requestId = _requestIds[err.requestOptions];
     final requestTime = _requestTimes[err.requestOptions];
-
-    if (requestId != null && requestTime != null) {
+    if (requestId != null && requestTime != null && err.response != null) {
       final duration = DateTime.now().difference(requestTime);
-
-      _interceptor.captureResponse(
+      final requestOptions = err.response!.requestOptions;
+      _interceptor.captureNetworkData(
         id: requestId,
-        statusCode: err.response?.statusCode,
-        responseBody: err.response?.data,
-        responseHeaders: err.response?.headers.map.map(
-          (key, value) => MapEntry(key, value.join(', ')),
+        url: requestOptions.uri.toString(),
+        method: requestOptions.method,
+        requestHeaders: requestOptions.headers.map((key, value) =>
+            MapEntry(key, value.toString())),
+        requestBody: requestOptions.data,
+        statusCode: err.response!.statusCode,
+        responseBody: err.response!.data,
+        responseHeaders: err.response!.headers.map.map(
+              (key, value) => MapEntry(key, value.join(', ')),
         ),
         duration: duration,
         error: err.message ?? err.toString(),
       );
-
       _requestIds.remove(err.requestOptions);
       _requestTimes.remove(err.requestOptions);
     }
-
-    handler.next(err);
   }
 }
 

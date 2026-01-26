@@ -4,13 +4,19 @@ version: 1.0.0
 publish_to: 'none'
 
 environment:
-  sdk: ^3.9.0
+  sdk: '>=3.4.3 <4.0.0'
+  flutter: ">=3.22.2 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^2.0.3
+  hive_generator: 2.0.1
+  build_runner: ^2.4.11

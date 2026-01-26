@@ -1,470 +1,1430 @@
-# DebugHub 🚀
+# DebugHub 🐛
+
+**A comprehensive Flutter debugging and monitoring toolkit built with Clean Architecture and SOLID Principles**
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
+  <img src="https://img.shields.io/badge/Flutter-3.9+-blue.svg" alt="Flutter Version">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/Architecture-Clean-brightgreen.svg" alt="Clean Architecture">
+  <img src="https://img.shields.io/badge/SOLID-Principles-blue.svg" alt="SOLID Principles">
 </p>
 
-**DebugHub** is a comprehensive Flutter debugging tool inspired by [CocoaDebug](https://github.com/CocoaDebug/CocoaDebug) for iOS. It provides an in-app debugging interface that helps developers monitor network requests, logs, crashes, storage, and device information - all without leaving your app!
+---
+
+## 📖 Table of Contents
+
+- [Overview](#-overview)
+- [Why DebugHub?](#-why-debughub)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Usage Examples](#-usage-examples)
+- [Advanced Features](#-advanced-features)
+- [Integration Guide](#-integration-guide)
+- [API Reference](#-api-reference)
+- [Architecture](#-architecture)
+- [Benefits](#-benefits)
+- [Production Safety](#-production-safety)
+- [Best Practices](#-best-practices)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## 🌟 Overview
+
+DebugHub is an enterprise-grade debugging and monitoring solution for Flutter applications that provides comprehensive insights into your app's behavior during development. With **just 3 lines of code**, you can integrate a powerful debugging toolkit that captures network requests, logs, crashes, analytics events, notifications, and much more.
+
+Built with **Clean Architecture** and following **SOLID Principles**, DebugHub is designed to be maintainable, testable, and easily extensible.
+
+---
+
+## 💡 Why DebugHub?
+
+### The Problem
+During development, developers often struggle with:
+- 🔍 **Debugging network requests** - Hard to inspect API calls and responses
+- 📝 **Tracking logs** - Scattered across console, making it difficult to filter and search
+- 💥 **Monitoring crashes** - Non-fatal errors often go unnoticed
+- 📊 **Validating analytics** - No easy way to verify event tracking
+- 🔔 **Testing notifications** - Difficult to see notification payloads and behavior
+- 🎯 **Device information** - Hard to access device/app info during testing
+
+### The Solution
+DebugHub provides a **unified debugging interface** that:
+- ✅ Captures everything automatically with minimal setup
+- ✅ Provides a beautiful, intuitive UI accessible via floating bubble
+- ✅ Persists data across app restarts
+- ✅ Works seamlessly with popular packages (Dio, Firebase, etc.)
+- ✅ Automatically disables in production builds
+- ✅ Requires NO code removal for production
+
+---
 
 ## ✨ Features
 
 ### 🌐 Network Monitoring
-- **Capture all HTTP/HTTPS requests** (supports `http` and `dio` packages)
-- View request/response headers and bodies
-- Beautiful JSON formatting
-- Filter by status (success, error, pending)
-- Search by URL or method
-- Share network logs via email or copy to clipboard
-- Request/response size tracking
-- Duration measurement
+- **Automatic capture** of all HTTP/HTTPS requests and responses
+- **Request details**: URL, method, headers, body
+- **Response details**: Status code, headers, body, duration
+- **cURL export**: Share requests as cURL commands
+- **Search & filter**: Find specific requests quickly
+- **Dio & HTTP support**: Works with popular networking packages
 
-### 📝 Log Management
-- Capture all app logs with different levels (verbose, debug, info, warning, error, wtf)
-- Filter logs by level
-- Search logs by keyword or tag
-- Long press to view full log details with stack traces
-- Copy logs to clipboard
-- Share logs via email
+### 📝 Comprehensive Logging
+- **Multiple log levels**: Verbose, Debug, Info, Warning, Error, WTF
+- **Tag-based organization**: Categorize logs for easy filtering
+- **Stack trace capture**: Full error context
+- **Search functionality**: Find logs instantly
+- **Persistent storage**: Logs survive app restarts
+- **Export capability**: Share logs easily
 
 ### 💥 Crash Reporting
-- Automatic crash detection
-- Stack trace capture
-- Manual crash reporting
-- View crash history
-- Share crash reports
+- **Non-fatal error tracking**: Catch and log errors without crashing
+- **Stack trace visualization**: Detailed error context
+- **Error categorization**: Organize crashes by type
+- **Global error handlers**: Integrate with Flutter error handling
+- **Crash history**: View all reported crashes
 
-### 📁 Storage Browser
-- Browse app documents directory
-- View file sizes
-- Navigate through folders
-- Storage usage statistics
+### 📊 Analytics Event Tracking
+- **Multi-source support**: Firebase, CleverTap, Custom events
+- **Property inspection**: View all event properties
+- **Google Sheets validation**: Validate events against expected configuration
+- **Event comparison**: Compare logged vs expected events
+- **Statistics dashboard**: View validation results and coverage
+- **Version-based validation**: Validate events per app version
+
+### 🔔 Notification Logging
+- **Received notifications**: Track all incoming notifications
+- **Tapped notifications**: Monitor user interactions
+- **Payload inspection**: View notification data
+- **Firebase integration**: Works seamlessly with FCM
+- **Notification history**: Access past notifications
 
 ### 📱 Device & App Information
-- App version and build number
-- Device model and OS version
-- Platform information
-- Flutter and Dart version
-- Copy any info to clipboard
+- **Device details**: Model, OS version, screen size
+- **App information**: Version, build number, package name
+- **Memory monitoring**: Real-time memory usage tracking
+- **Storage info**: Available and used storage
 
-### 🎯 User Experience
-- **Floating bubble** - Draggable debug button, always visible in debug mode
-- **Long press bubble** - Clear all debug data
-- **Beautiful UI** - Modern Material Design 3
-- **Customizable theme** - Set your own main color
-- **No performance impact** - Lightweight and efficient
-- **Optional shake gesture** - Can be enabled to show/hide bubble
+### 💾 Persistent Storage
+- **Hive-based storage**: Fast, reliable local storage
+- **Data persistence**: Survives app restarts
+- **Configurable limits**: Control storage size
+- **Clear functionality**: Easy data management
 
-## 📸 Screenshots
+### 🎨 Customizable UI
+- **Theme customization**: Match your brand colors
+- **Floating bubble**: Always accessible, draggable
+- **Bottom navigation**: Easy tab switching
+- **Search & filter**: Find what you need quickly
+- **Share functionality**: Export debug data
+- **Dark mode ready**: Beautiful in any theme
 
-*Coming soon - Run the app to see it in action!*
+### 🔧 Developer-Friendly
+- **3-line integration**: Minimal setup required
+- **Zero configuration**: Works out of the box
+- **Type-safe API**: Full Dart type safety
+- **Well documented**: Comprehensive documentation
+- **Clean architecture**: Easy to understand and extend
+- **Production safe**: Auto-disables in release mode
 
-## 🚀 Getting Started
+---
 
-### Installation
+## 🚀 Quick Start
 
-#### As a Plugin in Your Flutter Project
+### 1. Add Dependency
 
-1. **Copy the DebugHub packages** to your project:
-```bash
-# Copy the entire packages folder to your project
-cp -r packages/ your_project/packages/
-```
+Add DebugHub to your `pubspec.yaml`:
 
-2. **Add to your `pubspec.yaml`**:
 ```yaml
 dependencies:
-  debug_hub_ui:
-    path: packages/debug_hub_ui
-  base:
-    path: packages/base
-  network:
-    path: packages/network
-  log:
-    path: packages/log
-  storage:
-    path: packages/storage
-  non_fatal:
-    path: packages/non_fatal
+  debug_hub:
+    path: path/to/DebugHub
 ```
 
-3. **Run**:
-```bash
-flutter pub get
+Or if published to pub.dev:
+
+```yaml
+dependencies:
+  debug_hub: ^1.0.0
 ```
 
-### Basic Usage
-
-#### 1. Initialize DebugHub in your `main.dart`:
+### 2. Initialize (3 Lines of Code!)
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:debug_hub_ui/debug_hub_ui.dart';
+import 'package:debug_hub/debug_hub.dart';
 
-void main() {
-  // Initialize DebugHub with configuration
-  DebugHub().init(
-    config: const DebugHubConfig(
-      serverURL: 'https://api.yourserver.com', // Optional: Highlight your server URL
-      mainColor: Color(0xFF42d459), // Optional: Customize theme color
-      enableShakeGesture: false, // Keep bubble always visible (default)
-      enableLogMonitoring: true,
-      enableNetworkMonitoring: true,
-      enableCrashMonitoring: true,
-      showBubbleOnStart: true,
-    ),
-  );
-
-  // Enable DebugHub
-  DebugHub().enable();
-
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   runApp(const MyApp());
 }
-```
 
-#### 2. Wrap your app with DebugHub:
-
-```dart
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Your App',
-      navigatorKey: DebugHub().navigatorKey,
-      home: const YourHomePage(),
+      title: 'My App',
+      navigatorObservers: [DebugHubManager.getObserver()],
+      home: const HomeScreen(),
+      // Add DebugHub overlay (1 line!)
       builder: (context, child) {
-        return DebugHub().wrap(child ?? const SizedBox.shrink());
+        return DebugHubManager.initialize(
+          child: child!,
+          mainColor: Colors.blue, // Optional: customize color
+        );
       },
     );
   }
 }
 ```
 
-That's it! The floating debug bubble will appear in your app.
+### 3. Done! 🎉
 
-## 📚 Advanced Usage
+That's it! DebugHub is now active with a floating debug bubble. Tap it to access all debugging features.
 
-### Network Monitoring
+---
 
-#### Using with `http` package:
+## 📦 Installation
+
+### iOS Setup
+
+No additional setup required! DebugHub works out of the box on iOS.
+
+### Android Setup
+
+No additional setup required! DebugHub works out of the box on Android.
+
+### Google Sheets Event Validation (Optional)
+
+If you want to use the Google Sheets event validation feature:
+
+1. **Create a Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project
+
+2. **Enable APIs**
+   - Enable Google Sheets API
+   - Enable Google Sign-In API
+
+3. **Configure OAuth 2.0**
+   - Create OAuth 2.0 credentials
+   - Add your app's SHA-1 fingerprint (Android)
+   - Add your bundle ID (iOS)
+
+4. **Add Client ID to Your App**
+
+For Android (`android/app/build.gradle`):
+```gradle
+android {
+    defaultConfig {
+        resValue "string", "default_web_client_id", "YOUR_WEB_CLIENT_ID"
+    }
+}
+```
+
+For iOS (`ios/Runner/Info.plist`):
+```xml
+<key>GIDClientID</key>
+<string>YOUR_IOS_CLIENT_ID</string>
+```
+
+---
+
+## 💻 Usage Examples
+
+### Basic Logging
 
 ```dart
-import 'package:network/network.dart';
-import 'package:http/http.dart' as http;
+import 'package:debug_hub/debug_hub.dart';
 
-final networkInterceptor = NetworkInterceptor();
+// Simple log
+DebugHubManager.log('User logged in');
 
-Future<void> makeRequest() async {
-  // Capture request
-  final requestId = networkInterceptor.captureRequest(
-    url: 'https://api.example.com/data',
-    method: 'GET',
-    headers: {'Content-Type': 'application/json'},
-  );
+// Log with tag
+DebugHubManager.log('Payment processed', tag: 'Payment');
 
-  final startTime = DateTime.now();
-  
-  // Make actual request
-  final response = await http.get(
-    Uri.parse('https://api.example.com/data'),
-  );
+// Log with level
+DebugHubManager.log(
+  'Data loaded successfully',
+  tag: 'API',
+  level: AppLogLevel.info,
+);
 
-  // Capture response
-  networkInterceptor.captureResponse(
-    id: requestId,
-    statusCode: response.statusCode,
-    responseBody: response.body,
-    responseHeaders: response.headers.map((k, v) => MapEntry(k, v)),
-    duration: DateTime.now().difference(startTime),
+// Log error
+try {
+  await riskyOperation();
+} catch (e, stackTrace) {
+  DebugHubManager.logError(
+    'Operation failed',
+    error: e,
+    stackTrace: stackTrace,
+    tag: 'Error',
   );
 }
 ```
 
-#### Using with `dio` package:
+### Network Monitoring
+
+#### With Dio
 
 ```dart
 import 'package:dio/dio.dart';
 import 'package:network/network.dart';
 
 final dio = Dio();
-dio.interceptors.add(DebugDioInterceptor());
+dio.interceptors.add(DebugHubDioInterceptor());
 
-// All requests will be automatically captured
-final response = await dio.get('https://api.example.com/data');
+// All requests are now automatically logged
+final response = await dio.get('https://api.example.com/users');
 ```
 
-### Logging
+#### With HTTP Package
 
 ```dart
-import 'package:base/base.dart';
+import 'package:network/network.dart';
 
-final storage = DebugStorage();
+final client = DebugHttpClient();
+final response = await client.get(
+  Uri.parse('https://api.example.com/users'),
+);
+```
 
-// Add different log levels
-storage.addLog(
-  DebugLog.create(
-    level: LogLevel.info,
-    message: 'User logged in successfully',
-    tag: 'Auth',
-  ),
+### Analytics Event Tracking
+
+```dart
+import 'package:debug_hub/debug_hub.dart';
+
+// Track a simple event
+DebugHubManager.trackEvent('button_click');
+
+// Track event with properties
+DebugHubManager.trackEvent(
+  'product_viewed',
+  properties: {
+    'product_id': '12345',
+    'category': 'electronics',
+    'price': 299.99,
+  },
 );
 
-storage.addLog(
-  DebugLog.create(
-    level: LogLevel.error,
-    message: 'Failed to load data',
-    tag: 'API',
-    error: exception,
-    stackTrace: stackTrace,
-  ),
+// Track event with source
+DebugHubManager.trackEvent(
+  'screen_view',
+  properties: {
+    'screen_name': 'home',
+    'screen_class': 'HomeScreen',
+  },
+  source: 'Firebase',
 );
+```
+
+### Notification Logging
+
+#### Firebase Cloud Messaging Integration
+
+```dart
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:debug_hub/debug_hub.dart';
+
+// When notification is received
+FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  DebugHubManager.logNotification(
+    title: message.notification?.title,
+    body: message.notification?.body,
+    payload: message.data,
+    notificationId: message.messageId,
+  );
+});
+
+// When notification is tapped
+FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  DebugHubManager.logNotificationTap(
+    notificationId: message.messageId ?? 'unknown',
+    title: message.notification?.title,
+    payload: message.data,
+  );
+});
 ```
 
 ### Crash Reporting
 
 ```dart
-import 'package:non_fatal/non_fatal.dart';
+import 'package:debug_hub/debug_hub.dart';
 
 // Manual crash reporting
-CrashHandler().reportError(
-  error,
-  stackTrace: stackTrace,
-  context: 'User action context',
-  isFatal: false,
+try {
+  dangerousOperation();
+} catch (error, stackTrace) {
+  DebugHubManager.reportCrash(error, stackTrace);
+}
+
+// Global error handler
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Catch Flutter framework errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    DebugHubManager.reportCrash(
+      details.exception,
+      details.stack,
+    );
+  };
+  
+  // Catch async errors
+  PlatformDispatcher.instance.onError = (error, stack) {
+    DebugHubManager.reportCrash(error, stack);
+    return true;
+  };
+  
+  runApp(const MyApp());
+}
+```
+
+### Manual UI Access
+
+```dart
+import 'package:debug_hub/debug_hub.dart';
+
+// Show DebugHub screen programmatically
+ElevatedButton(
+  onPressed: () => DebugHubManager.show(context),
+  child: const Text('Open DebugHub'),
 );
 ```
 
-## ⚙️ Configuration Options
+### Clear Debug Data
 
 ```dart
-DebugHubConfig(
-  // Server URL to highlight in network requests
-  serverURL: 'https://api.yourserver.com',
+import 'package:debug_hub/debug_hub.dart';
+
+// Clear all debug data
+await DebugHubManager.clearAll();
+```
+
+---
+
+## 🎯 Advanced Features
+
+### Customization
+
+```dart
+DebugHubManager.initialize(
+  child: child!,
+  mainColor: Colors.purple,           // Custom theme color
+  userProperties: {                   // Custom user properties
+    'user_id': '12345',
+    'environment': 'staging',
+    'app_flavor': 'dev',
+  },
+);
+```
+
+### Update User Properties Dynamically
+
+```dart
+// Update user properties at runtime
+DebugHubManager.updateUserProperties({
+  'user_id': '67890',
+  'subscription': 'premium',
+});
+```
+
+### Enable Without UI
+
+```dart
+// Enable DebugHub tracking without showing UI
+// Useful for automated testing
+DebugHubManager.enableOnlyWithoutUI();
+```
+
+### Google Sheets Event Validation
+
+```dart
+import 'package:events/events.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+// Get package info
+final packageInfo = await PackageInfo.fromPlatform();
+
+// Navigate to validation dashboard
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => EventValidationDashboardScreen(
+      packageName: packageInfo.packageName,
+    ),
+  ),
+);
+```
+
+The validation feature allows you to:
+- **Compare logged events** with expected events from Google Sheets
+- **View statistics**: Missing events, extra events, property mismatches
+- **Version-based validation**: Validate events for specific app versions
+- **Export reports**: Share validation results
+
+---
+
+## 🔌 Integration Guide
+
+### Complete Integration Example
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:debug_hub/debug_hub.dart';
+import 'package:dio/dio.dart';
+import 'package:network/network.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   
-  // URLs to ignore from capturing
-  ignoredURLs: ['https://analytics.com'],
+  // Setup global error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    DebugHubManager.reportCrash(details.exception, details.stack);
+  };
   
-  // Only capture these URLs
-  onlyURLs: ['https://api.yourserver.com'],
+  PlatformDispatcher.instance.onError = (error, stack) {
+    DebugHubManager.reportCrash(error, stack);
+    return true;
+  };
   
-  // Log prefixes to ignore
-  ignoredPrefixLogs: ['[VERBOSE]'],
+  // Setup Firebase messaging
+  FirebaseMessaging.onMessage.listen((message) {
+    DebugHubManager.logNotification(
+      title: message.notification?.title,
+      body: message.notification?.body,
+      payload: message.data,
+      notificationId: message.messageId,
+    );
+  });
   
-  // Only capture logs with these prefixes
-  onlyPrefixLogs: ['[APP]'],
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    DebugHubManager.logNotificationTap(
+      notificationId: message.messageId ?? 'unknown',
+      title: message.notification?.title,
+    );
+  });
   
-  // Add custom tab
-  additionalTab: YourCustomWidget(),
-  additionalTabLabel: 'Custom',
-  additionalTabIcon: Icons.extension,
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My App',
+      navigatorObservers: [DebugHubManager.getObserver()],
+      home: const HomeScreen(),
+      builder: (context, child) {
+        return DebugHubManager.initialize(
+          child: child!,
+          mainColor: Colors.blue,
+          userProperties: {
+            'environment': kDebugMode ? 'debug' : 'release',
+          },
+        );
+      },
+    );
+  }
+}
+
+// Setup Dio with DebugHub
+class ApiService {
+  static final Dio _dio = Dio()
+    ..interceptors.add(DebugHubDioInterceptor());
   
-  // Email recipients for sharing
-  emailToRecipients: ['dev@example.com'],
-  emailCcRecipients: ['qa@example.com'],
-  
-  // Theme color
-  mainColor: Color(0xFF42d459),
-  
-  // Feature toggles
-  enableShakeGesture: true,
-  enableLogMonitoring: true,
-  enableNetworkMonitoring: true,
-  enableCrashMonitoring: true,
-  showBubbleOnStart: true,
-  
-  // Limits
-  maxLogs: 1000,
-  maxNetworkRequests: 500,
-  
-  // Bubble position
-  bubbleAlignment: Alignment.bottomRight,
-  
-  // Performance monitoring
-  enablePerformanceMonitoring: true,
+  static Future<Response> get(String url) async {
+    try {
+      return await _dio.get(url);
+    } catch (e, stackTrace) {
+      DebugHubManager.logError(
+        'API request failed',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'API',
+      );
+      rethrow;
+    }
+  }
+}
+```
+
+---
+
+## 📚 API Reference
+
+### DebugHubManager
+
+The main interface for interacting with DebugHub.
+
+#### Initialization
+
+```dart
+static Widget initialize({
+  required Widget child,
+  Color? mainColor,
+  Map<String, dynamic>? userProperties,
+})
+```
+
+Wraps your app to enable DebugHub overlay.
+
+**Parameters:**
+- `child` - Your root widget
+- `mainColor` - Optional theme color (default: green)
+- `userProperties` - Optional custom properties to display
+
+**Example:**
+```dart
+DebugHubManager.initialize(
+  child: child!,
+  mainColor: Colors.blue,
+  userProperties: {'user_id': '123'},
+);
+```
+
+#### Logging
+
+```dart
+static void log(
+  String message, {
+  String? tag,
+  AppLogLevel level = AppLogLevel.debug,
+})
+```
+
+Log a message with optional tag and level.
+
+**Parameters:**
+- `message` - Log message
+- `tag` - Optional category tag
+- `level` - Log level (verbose, debug, info, warning, error, wtf)
+
+**Example:**
+```dart
+DebugHubManager.log('User logged in', tag: 'Auth', level: AppLogLevel.info);
+```
+
+---
+
+```dart
+static void logError(
+  String message, {
+  dynamic error,
+  StackTrace? stackTrace,
+  String? tag,
+})
+```
+
+Log an error with optional error object and stack trace.
+
+**Parameters:**
+- `message` - Error description
+- `error` - Error object
+- `stackTrace` - Stack trace
+- `tag` - Optional category tag
+
+**Example:**
+```dart
+DebugHubManager.logError(
+  'Failed to load data',
+  error: e,
+  stackTrace: stackTrace,
+  tag: 'API',
+);
+```
+
+#### Event Tracking
+
+```dart
+static void trackEvent(
+  String name, {
+  Map<String, dynamic>? properties,
+  String? source,
+})
+```
+
+Track an analytics event.
+
+**Parameters:**
+- `name` - Event name
+- `properties` - Optional event properties
+- `source` - Optional event source (Firebase, CleverTap, etc.)
+
+**Example:**
+```dart
+DebugHubManager.trackEvent(
+  'button_click',
+  properties: {'button_id': 'submit'},
+  source: 'Firebase',
+);
+```
+
+#### Notification Logging
+
+```dart
+static void logNotification({
+  String? title,
+  String? body,
+  Map<String, dynamic>? payload,
+  String? notificationId,
+})
+```
+
+Log a received notification.
+
+**Parameters:**
+- `title` - Notification title
+- `body` - Notification body
+- `payload` - Notification data
+- `notificationId` - Unique identifier
+
+**Example:**
+```dart
+DebugHubManager.logNotification(
+  title: 'New Message',
+  body: 'You have a new message',
+  payload: {'message_id': '123'},
+  notificationId: 'notif_123',
+);
+```
+
+---
+
+```dart
+static void logNotificationTap({
+  required String notificationId,
+  String? title,
+  String? body,
+  Map<String, dynamic>? payload,
+})
+```
+
+Log a notification tap.
+
+**Parameters:**
+- `notificationId` - Unique identifier (required)
+- `title` - Notification title
+- `body` - Notification body
+- `payload` - Notification data
+
+**Example:**
+```dart
+DebugHubManager.logNotificationTap(
+  notificationId: 'notif_123',
+  title: 'New Message',
+);
+```
+
+#### Crash Reporting
+
+```dart
+static void reportCrash(
+  dynamic error,
+  StackTrace? stackTrace, {
+  bool isFatal = false,
+})
+```
+
+Report a crash or error.
+
+**Parameters:**
+- `error` - Error object
+- `stackTrace` - Stack trace
+- `isFatal` - Whether the crash is fatal
+
+**Example:**
+```dart
+DebugHubManager.reportCrash(error, stackTrace);
+```
+
+#### Utilities
+
+```dart
+static NavigatorObserver getObserver()
+```
+
+Get the NavigatorObserver for route tracking.
+
+**Example:**
+```dart
+MaterialApp(
+  navigatorObservers: [DebugHubManager.getObserver()],
+  // ...
 )
 ```
 
+---
+
+```dart
+static Future<void> clearAll()
+```
+
+Clear all debug data.
+
+**Example:**
+```dart
+await DebugHubManager.clearAll();
+```
+
+---
+
+```dart
+static void show(BuildContext context)
+```
+
+Show DebugHub screen manually.
+
+**Example:**
+```dart
+DebugHubManager.show(context);
+```
+
+---
+
+```dart
+static void updateUserProperties(Map<String, dynamic> userProperties)
+```
+
+Update user properties dynamically.
+
+**Example:**
+```dart
+DebugHubManager.updateUserProperties({'user_id': '123'});
+```
+
+---
+
+```dart
+static void enableOnlyWithoutUI()
+```
+
+Enable DebugHub tracking without showing UI.
+
+**Example:**
+```dart
+DebugHubManager.enableOnlyWithoutUI();
+```
+
+---
+
 ## 🏗️ Architecture
 
-DebugHub is built with a modular architecture:
+DebugHub follows **Clean Architecture** principles with clear separation of concerns:
 
 ```
-packages/
-├── base/              # Core models and storage
-│   ├── models/        # Data models (NetworkRequest, DebugLog, CrashReport)
-│   ├── storage/       # In-memory storage
-│   └── utils/         # Utilities (JSON formatter, date formatter)
-├── network/           # Network monitoring
-│   ├── interceptors/  # HTTP and Dio interceptors
-│   └── handlers/      # Request/response handling
-├── log/               # Log capture
-│   └── interceptors/  # Log interception
-├── storage/           # File browser
-│   └── utils/         # File system utilities
-├── non_fatal/         # Crash reporting
-│   └── handlers/      # Error handlers
-└── debug_hub_ui/      # UI components
-    ├── screens/       # All UI screens
-    ├── widgets/       # Reusable widgets
-    └── config/        # Configuration
+┌─────────────────────────────────────────────────────────────┐
+│                     Presentation Layer                       │
+│  (UI Screens, Widgets, State Management)                    │
+│  Package: debug_hub_ui                                       │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                     Application Layer                        │
+│  (Use Cases, Business Logic, Repositories)                  │
+│  Packages: events, notification, non_fatal                  │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                      Domain Layer                            │
+│  (Entities, Models, Interfaces)                             │
+│  Package: base                                               │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                  Infrastructure Layer                        │
+│  (Data Sources, External Services, Storage)                 │
+│  Packages: network, log, storage                            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## 🎯 Use Cases
+### Package Structure
 
-### Development
-- Debug network issues in real-time
-- Monitor app logs without connecting to IDE
-- Test error handling
-- Inspect app storage
+```
+debug_hub/
+├── lib/
+│   ├── debug_hub.dart              # Main export
+│   └── debug_hub_interface.dart    # Simplified API
+├── packages/
+│   ├── base/                       # Core models & storage
+│   ├── network/                    # Network monitoring
+│   ├── log/                        # Log tracking
+│   ├── events/                     # Event tracking & validation
+│   ├── notification/               # Notification logging
+│   ├── non_fatal/                  # Crash reporting
+│   └── debug_hub_ui/               # UI components
+└── example/                        # Example app
+```
 
-### QA Testing
-- Share detailed bug reports with network logs
-- Capture crash information
-- Verify API responses
-- Check device-specific issues
+### SOLID Principles
 
-### Production Debugging (Debug builds only)
-- Investigate user-reported issues
-- Monitor network performance
-- Track error patterns
+#### 1. Single Responsibility Principle (SRP)
+Each class has one reason to change:
+- `DebugStorage` - Manages in-memory data
+- `PersistentStorage` - Handles disk persistence
+- `EventTracker` - Tracks analytics events
+- `NetworkInterceptor` - Captures network requests
 
-## ⚠️ Important Notes
+#### 2. Open/Closed Principle (OCP)
+Open for extension, closed for modification:
+- Extensible configuration via `DebugHubConfig`
+- Interceptor pattern for different HTTP clients
+- Plugin architecture for new features
 
-1. **Never ship DebugHub in production builds!** Always use it only in debug mode:
+#### 3. Liskov Substitution Principle (LSP)
+Subtypes are substitutable:
+- Storage implementations are interchangeable
+- Interceptors follow common interface
+
+#### 4. Interface Segregation Principle (ISP)
+Clients depend only on what they use:
+- Separate interfaces for logging, events, notifications
+- No fat interfaces
+
+#### 5. Dependency Inversion Principle (DIP)
+Depend on abstractions:
+- Repository pattern with interfaces
+- Dependency injection throughout
+
+### Design Patterns
+
+- **Singleton**: Global state management
+- **Repository**: Data access abstraction
+- **Adapter**: HTTP client adaptation
+- **Factory**: Object creation
+- **Observer**: UI updates
+- **Strategy**: Flexible implementations
+
+---
+
+## 🎁 Benefits
+
+### For Developers
+
+✅ **Save Time**: No more switching between tools - everything in one place  
+✅ **Debug Faster**: Instant access to all debug information  
+✅ **Better Insights**: Comprehensive view of app behavior  
+✅ **Easy Integration**: Just 3 lines of code  
+✅ **Zero Maintenance**: Auto-disables in production  
+✅ **Clean Code**: No debug code scattered in your app  
+
+### For Teams
+
+✅ **Consistent Debugging**: Same tools for all team members  
+✅ **Easy Sharing**: Export and share debug data  
+✅ **Quality Assurance**: Validate analytics events  
+✅ **Better Testing**: QA can access debug info easily  
+✅ **Documentation**: Self-documenting debug data  
+
+### For Projects
+
+✅ **Faster Development**: Reduce debugging time  
+✅ **Better Quality**: Catch issues early  
+✅ **Maintainable**: Clean architecture, easy to extend  
+✅ **Professional**: Enterprise-grade solution  
+✅ **Future-Proof**: Built to scale  
+
+---
+
+## 🛡️ Production Safety
+
+DebugHub is designed to be **100% safe for production**:
+
+### Automatic Disabling
+
+DebugHub automatically detects release mode and disables itself:
+
 ```dart
-void main() {
-  if (kDebugMode) {
-    DebugHub().init();
-    DebugHub().enable();
-  }
+// This code is safe in production
+DebugHubManager.log('test');                // No-op in release
+DebugHubManager.trackEvent('event');        // No-op in release
+```
+
+### No Code Removal Needed
+
+You don't need to:
+- ❌ Remove DebugHub calls before release
+- ❌ Wrap calls in `kDebugMode` checks
+- ❌ Use conditional imports
+- ❌ Configure build variants
+
+What you need to do:
+- ✅ Just Initialize the DebugHub with kDebugMode check - whatever your logic can modify when to initialize the library with UI or Without UI.
+
+
+### Zero Performance Impact
+
+In release mode:
+- ✅ No UI overlay
+- ✅ No data collection
+- ✅ No storage usage
+- ✅ No memory overhead
+- ✅ No performance impact
+
+---
+
+## 🎓 Best Practices
+
+### 1. Initialize Early
+
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Setup error handling first
+  FlutterError.onError = (details) {
+    DebugHubManager.reportCrash(details.exception, details.stack);
+  };
+  
   runApp(const MyApp());
 }
 ```
 
-2. **Performance**: DebugHub is designed to be lightweight, but it does store data in memory. Use the provided limits to prevent memory issues.
-
-3. **Privacy**: Be careful when sharing debug data - it may contain sensitive information like API keys or user data.
-
-## 🔧 Development
-
-### Running the Example App
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd DebugHub
-
-# Get dependencies
-flutter pub get
-
-# Run the app
-flutter run
-```
-
-### Building for Release
-
-Make sure to disable DebugHub in release builds:
+### 2. Use Meaningful Tags
 
 ```dart
-import 'package:flutter/foundation.dart';
+// Good: Organized by feature
+DebugHubManager.log('User logged in', tag: 'Auth');
+DebugHubManager.log('Payment processed', tag: 'Payment');
+DebugHubManager.log('Data synced', tag: 'Sync');
 
-void main() {
-  if (kDebugMode) {
-    DebugHub().init();
-    DebugHub().enable();
-  }
-  runApp(const MyApp());
+// Bad: No tags or vague tags
+DebugHubManager.log('Something happened');
+DebugHubManager.log('Event', tag: 'General');
+```
+
+### 3. Track Important Events
+
+```dart
+// Track user actions
+DebugHubManager.trackEvent('button_click', properties: {
+  'button_id': 'checkout',
+  'screen': 'cart',
+});
+
+// Track screen views
+DebugHubManager.trackEvent('screen_view', properties: {
+  'screen_name': 'product_detail',
+  'product_id': '12345',
+});
+
+// Track business events
+DebugHubManager.trackEvent('purchase_completed', properties: {
+  'amount': 99.99,
+  'currency': 'USD',
+  'items': 3,
+});
+```
+
+### 4. Always Report Errors
+
+```dart
+try {
+  await riskyOperation();
+} catch (e, stackTrace) {
+  // Always report non-fatal errors
+  DebugHubManager.reportCrash(e, stackTrace);
+  
+  // Also log for context
+  DebugHubManager.logError(
+    'Operation failed',
+    error: e,
+    stackTrace: stackTrace,
+    tag: 'Error',
+  );
 }
 ```
 
-## 📦 Package Structure
+### 5. Use Network Interceptors
 
-- **base**: Core functionality and data models
-- **network**: Network request interception and monitoring
-- **log**: Log capture and management
-- **storage**: File system browser
-- **non_fatal**: Crash and error reporting
-- **events**: Event tracking (future feature)
-- **notification**: Notification monitoring (future feature)
-- **debug_hub_ui**: Main UI package with all screens and widgets
+```dart
+// Setup once, capture all requests
+final dio = Dio()..interceptors.add(DebugHubDioInterceptor());
+
+// All requests are now automatically logged
+await dio.get('https://api.example.com/users');
+await dio.post('https://api.example.com/users', data: {...});
+```
+
+### 6. Validate Analytics Events
+
+```dart
+// Use Google Sheets validation to ensure
+// your events match expected configuration
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => EventValidationDashboardScreen(
+      packageName: 'com.yourcompany.app', // will be taken automatically using package info
+    ),
+  ),
+);
+```
+
+### 7. Clear Data Regularly
+
+```dart
+// Clear debug data during development to avoid clutter
+await DebugHubManager.clearAll();
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### DebugHub Not Showing
+
+**Problem**: Floating bubble doesn't appear
+
+**Solutions**:
+1. Ensure you're in debug mode: `flutter run` (not `flutter run --release`)
+2. Verify initialization:
+   ```dart
+   builder: (context, child) {
+     return DebugHubManager.initialize(child: child!);
+   }
+   ```
+3. Check that `navigatorObservers` includes the observer:
+   ```dart
+   navigatorObservers: [DebugHubManager.getObserver()]
+   ```
+
+---
+
+### Logs Not Appearing
+
+**Problem**: Logs don't show in DebugHub
+
+**Solutions**:
+1. Use `DebugHubManager.log()` instead of `print()`
+2. Check log level filters in UI
+3. Verify you're in debug mode
+4. Try clearing and re-logging:
+   ```dart
+   await DebugHubManager.clearAll();
+   DebugHubManager.log('Test log');
+   ```
+
+---
+
+### Network Requests Not Captured
+
+**Problem**: API calls don't appear in Network tab
+
+**Solutions**:
+1. Add interceptor to Dio:
+   ```dart
+   dio.interceptors.add(DebugHubDioInterceptor());
+   ```
+2. Or use DebugHttpClient:
+   ```dart
+   final client = DebugHttpClient();
+   ```
+3. Ensure interceptor is added before making requests
+4. Check that you're using the instrumented client
+
+---
+
+### Events Not Tracked
+
+**Problem**: Analytics events don't appear
+
+**Solutions**:
+1. Use `DebugHubManager.trackEvent()`:
+   ```dart
+   DebugHubManager.trackEvent('event_name', properties: {...});
+   ```
+2. Check Events tab in DebugHub UI
+3. Verify you're in debug mode
+
+---
+
+### Google Sheets Validation Error
+
+**Problem**: "Sign-in error code 10" or authentication fails
+
+**Solutions**:
+1. Configure OAuth 2.0 in Google Cloud Console
+2. Add SHA-1 fingerprint (Android):
+   ```bash
+   keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey
+   ```
+3. Add client ID to app configuration
+4. See detailed setup guide in Events package documentation
+
+---
+
+### Memory Issues
+
+**Problem**: App uses too much memory
+
+**Solutions**:
+1. Clear debug data regularly:
+   ```dart
+   await DebugHubManager.clearAll();
+   ```
+2. Configure storage limits (coming soon)
+3. Disable DebugHub if not needed:
+   ```dart
+   // Don't initialize DebugHub
+   ```
+
+---
+
+### Build Errors
+
+**Problem**: Build fails after adding DebugHub
+
+**Solutions**:
+1. Run `flutter pub get`
+2. Clean build:
+   ```bash
+   flutter clean
+   flutter pub get
+   flutter run
+   ```
+3. Check Flutter version (requires 3.9+)
+4. Check Dart SDK version (requires 3.4.3+)
+
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Here's how you can help:
 
-## 📝 License
+### Reporting Issues
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+1. Check existing issues first
+2. Provide detailed description
+3. Include steps to reproduce
+4. Share relevant code snippets
+5. Mention Flutter/Dart versions
+
+### Submitting Pull Requests
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Write/update tests
+5. Update documentation
+6. Submit PR with clear description
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/DebugHub.git
+
+# Install dependencies
+cd DebugHub
+flutter pub get
+
+# Run example app
+cd example
+flutter run
+```
+
+### Code Style
+
+- Follow Dart style guide
+- Use meaningful variable names
+- Add comments for complex logic
+- Write documentation for public APIs
+- Follow existing patterns
+
+---
+
+## 📄 License
+
+MIT License
+
+Copyright (c) 2024 DebugHub
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## 🌟 Features Comparison
+
+| Feature | DebugHub | Other Tools |
+|---------|----------|-------------|
+| Network Monitoring | ✅ | ✅ |
+| Log Tracking | ✅ | ✅ |
+| Crash Reporting | ✅ | ✅ |
+| Event Tracking | ✅ | ❌ |
+| Event Validation | ✅ | ❌ |
+| Google Sheets Integration | ✅ | ❌ |
+| Notification Logging | ✅ | ❌ |
+| Memory Monitoring | ✅ | ❌ |
+| Persistent Storage | ✅ | ❌ |
+| Floating Bubble UI | ✅ | ⚠️ |
+| Bottom Navigation | ✅ | ❌ |
+| Search & Filter | ✅ | ⚠️ |
+| Share Functionality | ✅ | ⚠️ |
+| cURL Export | ✅ | ⚠️ |
+| Minimal Setup | ✅ (3 lines) | ❌ |
+| Auto-disable in Release | ✅ | ✅ |
+| Clean Architecture | ✅ | ❌ |
+| SOLID Principles | ✅ | ❌ |
+| Well Documented | ✅ | ⚠️ |
+| Easy to Extend | ✅ | ❌ |
+
+---
+
+## 🚀 Roadmap
+
+### Upcoming Features
+
+- [ ] **Web Support** - Full web platform support
+- [ ] **Desktop Support** - Windows, macOS, Linux support
+- [ ] **Remote Debugging** - Debug apps remotely
+- [ ] **Performance Monitoring** - FPS, frame timing, jank detection
+- [ ] **Custom Plugins API** - Create custom debug plugins
+- [ ] **Export Formats** - CSV, JSON, PDF exports
+- [ ] **Database Inspector** - View SQLite/Hive data
+- [ ] **Shared Preferences Viewer** - Inspect app preferences
+- [ ] **Widget Inspector** - Flutter widget tree inspection
+- [ ] **Timeline View** - Visual timeline of events
+- [ ] **Filtering Presets** - Save and load filter configurations
+- [ ] **Dark Mode** - Full dark mode support
+
+### Architecture Improvements
+
+- [ ] **Use Cases Layer** - Explicit use cases for complex operations
+- [ ] **State Management** - Integrate Riverpod/Bloc
+- [ ] **Dependency Injection** - Add GetIt container
+- [ ] **Unit Tests** - >80% code coverage
+- [ ] **Widget Tests** - UI component tests
+- [ ] **Integration Tests** - End-to-end tests
+
+---
+
+## 💬 Support
+
+### Documentation
+
+- **This README** - Complete overview and guide
+- **API Reference** - Detailed API documentation (above)
+- **Example App** - Working example in `example/` folder
+- **Package READMEs** - Individual package documentation
+
+### Getting Help
+
+1. **Check Documentation** - Most questions are answered here
+2. **Search Issues** - Someone may have had the same problem
+3. **Ask Questions** - Open a discussion on GitHub
+4. **Report Bugs** - Open an issue with details
+
+### Community
+
+- **GitHub Discussions** - Ask questions, share ideas
+- **GitHub Issues** - Report bugs, request features
+- **Pull Requests** - Contribute improvements
+
+---
 
 ## 🙏 Acknowledgments
 
-- Inspired by [CocoaDebug](https://github.com/CocoaDebug/CocoaDebug) for iOS
-- Built with ❤️ using Flutter
+DebugHub is built with and inspired by:
 
-## 📞 Support
+- **Flutter** - Amazing cross-platform framework
+- **Hive** - Fast and lightweight local storage
+- **Dio** - Powerful HTTP client
+- **Google Sheets API** - Event validation integration
+- **Clean Architecture** - Robert C. Martin
+- **SOLID Principles** - Best practices for maintainable code
 
-If you have any questions or issues, please open an issue on GitHub.
-
----
-
-## 🎨 Customization Examples
-
-### Custom Theme
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    mainColor: Color(0xFFFF5722), // Orange theme
-  ),
-);
-```
-
-### Filter Specific URLs
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    serverURL: 'https://api.myapp.com',
-    ignoredURLs: [
-      'https://analytics.google.com',
-      'https://crashlytics.com',
-    ],
-  ),
-);
-```
-
-### Add Custom Tab
-```dart
-DebugHub().init(
-  config: DebugHubConfig(
-    additionalTab: MyCustomDebugScreen(),
-    additionalTabLabel: 'Custom',
-    additionalTabIcon: Icons.settings,
-  ),
-);
-```
-
-## 🚦 Roadmap
-
-- [ ] WebSocket monitoring
-- [ ] GraphQL support
-- [ ] Performance metrics
-- [ ] Memory profiling
-- [ ] Widget inspector
-- [ ] Timeline view
-- [ ] Export to file
-- [ ] Remote debugging
-- [ ] Plugin system
-
-## 💡 Tips
-
-1. **Always Visible**: The debug bubble stays visible in debug mode for easy access
-2. **Long Press**: Long press the bubble to clear all debug data
-3. **Search**: Use the search feature in Network and Logs tabs to quickly find what you need
-4. **Share**: Use the share button to send debug data via email or other apps
-5. **Copy**: Tap the copy icon to copy specific data to clipboard
-6. **Optional Shake**: Set `enableShakeGesture: true` if you want to hide/show bubble with shake
+Special thanks to all contributors and users!
 
 ---
 
-Made with 💚 for Flutter developers
+## 📞 Contact
+
+For questions, suggestions, or feedback:
+
+- **GitHub**: [DebugHub Repository](https://github.com/yourusername/DebugHub)
+- **Issues**: [Report a Bug](https://github.com/yourusername/DebugHub/issues)
+- **Discussions**: [Ask a Question](https://github.com/yourusername/DebugHub/discussions)
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ for Flutter developers</strong>
+  <br>
+  <em>Debug smarter, not harder!</em> 🐛✨
+</p>
+
+---
+
+## 📝 Quick Reference Card
+
+### Installation
+```yaml
+dependencies:
+  debug_hub: ^1.0.0
+```
+
+### Setup
+```dart
+MaterialApp(
+  navigatorObservers: [DebugHubManager.getObserver()],
+  builder: (context, child) {
+    return DebugHubManager.initialize(child: child!);
+  },
+)
+```
+
+### Usage
+```dart
+// Logging
+DebugHubManager.log('message', tag: 'Tag');
+DebugHubManager.logError('error', error: e, stackTrace: s);
+
+// Events
+DebugHubManager.trackEvent('event', properties: {...});
+
+// Notifications
+DebugHubManager.logNotification(title: '...', body: '...');
+DebugHubManager.logNotificationTap(notificationId: '...');
+
+// Crashes
+DebugHubManager.reportCrash(error, stackTrace);
+
+// Network (Dio)
+dio.interceptors.add(DebugHubDioInterceptor());
+
+// Utilities
+await DebugHubManager.clearAll();
+DebugHubManager.show(context);
+```
+
+---
+
+**That's everything you need to know about DebugHub! Happy debugging! 🚀**

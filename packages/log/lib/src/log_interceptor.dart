@@ -12,7 +12,7 @@ class LogInterceptor {
   void interceptPrint(String message, {String? tag}) {
     _logger.log(
       message,
-      level: LogLevel.debug,
+      level: AppLogLevel.debug,
       tag: tag ?? 'print',
     );
   }
@@ -20,7 +20,7 @@ class LogInterceptor {
   void interceptDebugPrint(String message, {String? tag}) {
     _logger.log(
       message,
-      level: LogLevel.debug,
+      level: AppLogLevel.debug,
       tag: tag ?? 'debugPrint',
     );
   }
@@ -34,15 +34,15 @@ class LogInterceptor {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    LogLevel logLevel;
+    AppLogLevel logLevel;
     if (level >= 1000) {
-      logLevel = LogLevel.error;
+      logLevel = AppLogLevel.error;
     } else if (level >= 900) {
-      logLevel = LogLevel.warning;
+      logLevel = AppLogLevel.warning;
     } else if (level >= 800) {
-      logLevel = LogLevel.info;
+      logLevel = AppLogLevel.info;
     } else {
-      logLevel = LogLevel.debug;
+      logLevel = AppLogLevel.debug;
     }
 
     _logger.log(

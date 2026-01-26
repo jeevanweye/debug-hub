@@ -4,13 +4,13 @@ import 'package:base/base.dart';
 void main() {
   test('DebugLog creation', () {
     final log = DebugLog.create(
-      level: LogLevel.info,
+      level: AppLogLevel.info,
       message: 'Test message',
       tag: 'Test',
     );
     
     expect(log.message, 'Test message');
-    expect(log.level, LogLevel.info);
+    expect(log.level, AppLogLevel.info);
     expect(log.tag, 'Test');
   });
 
@@ -32,7 +32,7 @@ void main() {
     storage.clearLogs();
     
     final log = DebugLog.create(
-      level: LogLevel.info,
+      level: AppLogLevel.info,
       message: 'Test',
     );
     

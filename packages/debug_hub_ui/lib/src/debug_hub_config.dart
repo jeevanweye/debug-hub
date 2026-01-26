@@ -34,9 +34,6 @@ class DebugHubConfig {
   /// Main theme color for debug UI
   final Color mainColor;
 
-  /// Enable shake gesture to show/hide debug bubble (disabled by default to keep bubble always visible)
-  final bool enableShakeGesture;
-
   /// Enable log monitoring
   final bool enableLogMonitoring;
 
@@ -45,6 +42,12 @@ class DebugHubConfig {
 
   /// Enable crash monitoring
   final bool enableCrashMonitoring;
+
+  /// Enable event monitoring (analytics events)
+  final bool enableEventMonitoring;
+
+  /// Enable notification monitoring
+  final bool enableNotificationMonitoring;
 
   /// Maximum number of logs to store
   final int maxLogs;
@@ -61,6 +64,11 @@ class DebugHubConfig {
   /// Enable performance monitoring
   final bool enablePerformanceMonitoring;
 
+  /// Package name for event validation (e.g., com.example.app)
+  final String? packageName;
+
+  final Map<String, dynamic>? userProperties;
+
   const DebugHubConfig({
     this.serverURL,
     this.ignoredURLs,
@@ -73,15 +81,18 @@ class DebugHubConfig {
     this.emailToRecipients,
     this.emailCcRecipients,
     this.mainColor = const Color(0xFF42d459),
-    this.enableShakeGesture = false,
     this.enableLogMonitoring = true,
     this.enableNetworkMonitoring = true,
     this.enableCrashMonitoring = true,
+    this.enableEventMonitoring = true,
+    this.enableNotificationMonitoring = true,
     this.maxLogs = 1000,
     this.maxNetworkRequests = 500,
     this.showBubbleOnStart = true,
     this.bubbleAlignment = Alignment.bottomRight,
     this.enablePerformanceMonitoring = true,
+    this.packageName,
+    this.userProperties,
   });
 
   DebugHubConfig copyWith({
@@ -100,11 +111,15 @@ class DebugHubConfig {
     bool? enableLogMonitoring,
     bool? enableNetworkMonitoring,
     bool? enableCrashMonitoring,
+    bool? enableEventMonitoring,
+    bool? enableNotificationMonitoring,
     int? maxLogs,
     int? maxNetworkRequests,
     bool? showBubbleOnStart,
     Alignment? bubbleAlignment,
     bool? enablePerformanceMonitoring,
+    String? packageName,
+    Map<String, dynamic>? userProperties,
   }) {
     return DebugHubConfig(
       serverURL: serverURL ?? this.serverURL,
@@ -118,15 +133,18 @@ class DebugHubConfig {
       emailToRecipients: emailToRecipients ?? this.emailToRecipients,
       emailCcRecipients: emailCcRecipients ?? this.emailCcRecipients,
       mainColor: mainColor ?? this.mainColor,
-      enableShakeGesture: enableShakeGesture ?? this.enableShakeGesture,
       enableLogMonitoring: enableLogMonitoring ?? this.enableLogMonitoring,
       enableNetworkMonitoring: enableNetworkMonitoring ?? this.enableNetworkMonitoring,
       enableCrashMonitoring: enableCrashMonitoring ?? this.enableCrashMonitoring,
+      enableEventMonitoring: enableEventMonitoring ?? this.enableEventMonitoring,
+      enableNotificationMonitoring: enableNotificationMonitoring ?? this.enableNotificationMonitoring,
       maxLogs: maxLogs ?? this.maxLogs,
       maxNetworkRequests: maxNetworkRequests ?? this.maxNetworkRequests,
       showBubbleOnStart: showBubbleOnStart ?? this.showBubbleOnStart,
       bubbleAlignment: bubbleAlignment ?? this.bubbleAlignment,
       enablePerformanceMonitoring: enablePerformanceMonitoring ?? this.enablePerformanceMonitoring,
+      packageName: packageName ?? this.packageName,
+      userProperties: userProperties ?? this.userProperties,
     );
   }
 

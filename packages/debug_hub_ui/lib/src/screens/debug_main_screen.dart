@@ -3,8 +3,9 @@ import '../debug_hub_config.dart';
 import 'network_screen.dart';
 import 'logs_screen.dart';
 import 'crashes_screen.dart';
-import 'storage_screen.dart';
-import 'app_info_screen.dart';
+import 'events_screen.dart';
+import 'more_screen.dart';
+import 'notifications_screen.dart';
 
 class DebugMainScreen extends StatefulWidget {
   final DebugHubConfig config;
@@ -18,60 +19,94 @@ class DebugMainScreen extends StatefulWidget {
   State<DebugMainScreen> createState() => _DebugMainScreenState();
 }
 
-class _DebugMainScreenState extends State<DebugMainScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DebugMainScreenState extends State<DebugMainScreen> {
+  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    final tabCount = widget.config.additionalTab != null ? 6 : 5;
-    _tabController = TabController(length: tabCount, vsync: this);
-  }
+  List<Widget> get _screens => [
+    NetworkScreen(config: widget.config),
+    EventsScreen(config: widget.config),
+    NotificationsScreen(config: widget.config),
+    LogsScreen(config: widget.config),
+    MoreScreen(config: widget.config),
+    if (widget.config.additionalTab != null)
+      widget.config.additionalTab!,
+  ];
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  List<BottomNavigationBarItem> get _navItems => [
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.network_check),
+      label: 'Network',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.analytics),
+      label: 'Events',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.notifications_active_rounded),
+      label: 'Notifications',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.article),
+      label: 'Logs',
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.more_horiz),
+      label: 'More',
+    ),
+    if (widget.config.additionalTab != null)
+      BottomNavigationBarItem(
+        icon: Icon(widget.config.additionalTabIcon ?? Icons.extension),
+        label: widget.config.additionalTabLabel ?? 'Custom',
+      ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('DebugHub'),
-        backgroundColor: widget.config.mainColor,
-        foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: [
-            const Tab(icon: Icon(Icons.network_check), text: 'Network'),
-            const Tab(icon: Icon(Icons.article), text: 'Logs'),
-            const Tab(icon: Icon(Icons.error_outline), text: 'Crashes'),
-            const Tab(icon: Icon(Icons.folder), text: 'Storage'),
-            const Tab(icon: Icon(Icons.info), text: 'App Info'),
-            if (widget.config.additionalTab != null)
-              Tab(
-                icon: Icon(widget.config.additionalTabIcon ?? Icons.extension),
-                text: widget.config.additionalTabLabel ?? 'Custom',
-              ),
-          ],
+    return Container(
+      color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('DebugHub'),
+          backgroundColor: widget.config.mainColor,
+          foregroundColor: Colors.white,
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          NetworkScreen(config: widget.config),
-          LogsScreen(config: widget.config),
-          CrashesScreen(config: widget.config),
-          StorageScreen(config: widget.config),
-          AppInfoScreen(config: widget.config),
-          if (widget.config.additionalTab != null)
-            widget.config.additionalTab!,
-        ],
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 8,
+                spreadRadius: 0,
+                offset: const Offset(0, -10),
+              ),
+            ],
+          ),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeBottom: true,
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              items: _navItems,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: widget.config.mainColor,
+              unselectedItemColor: Colors.grey,
+              selectedFontSize: 12,
+              unselectedFontSize: 11,
+              showUnselectedLabels: true,
+            ),
+          ),
+        ),
       ),
     );
   }

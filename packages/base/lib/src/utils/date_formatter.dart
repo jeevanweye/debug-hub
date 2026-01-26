@@ -28,6 +28,22 @@ class DateFormatter {
     }
   }
 
+  static String formatTime12Hour(DateTime dateTime) {
+    final hour12 = dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12;
+    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+
+    return '${hour12.toString().padLeft(2, '0')}:'
+        '${dateTime.minute.toString().padLeft(2, '0')}:'
+        '${dateTime.second.toString().padLeft(2, '0')} '
+        '$period';
+  }
+
+  static String formatDate(DateTime dateTime) {
+    return '${dateTime.day.toString().padLeft(2, '0')}-'
+        '${dateTime.month.toString().padLeft(2, '0')}-'
+        '${dateTime.year}';
+  }
+
   static String _twoDigits(int n) {
     if (n >= 10) return '$n';
     return '0$n';

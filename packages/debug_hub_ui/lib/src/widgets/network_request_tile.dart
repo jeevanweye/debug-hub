@@ -54,9 +54,6 @@ class NetworkRequestTile extends StatelessWidget {
 
   String _getDisplayUrl() {
     String url = request.url;
-    if (config.serverURL != null && url.contains(config.serverURL!)) {
-      return url.replaceAll(config.serverURL!, '');
-    }
     return url;
   }
 
@@ -155,9 +152,7 @@ class NetworkRequestTile extends StatelessWidget {
                 Icon(Icons.access_time, size: 12, color: Colors.grey[600]),
                 const SizedBox(width: 4),
                 Text(
-                  '${request.timestamp.hour.toString().padLeft(2, '0')}:'
-                  '${request.timestamp.minute.toString().padLeft(2, '0')}:'
-                  '${request.timestamp.second.toString().padLeft(2, '0')}',
+                  DateFormatter.formatTime12Hour(request.timestamp),
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey[600],
